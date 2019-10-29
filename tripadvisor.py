@@ -44,7 +44,7 @@ def cambiopag():
     for i in range(0,(count-1)):
         listnames()
         listprices()
-        actions.click(page).perform()
+        page.click()
         time.sleep(4)
 
 cambiopag()
