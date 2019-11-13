@@ -12,7 +12,6 @@ import urllib.parse
 
 driver = webdriver.Chrome('chromedriver.exe')
 chrome_options = Options()
-chrome_options.add_argument("--incognito")
 driver.get("http://www.tripadvisor.it")
 hotels = driver.find_element_by_xpath("//div[@id='component_4']/div//span[1]/div") #hotels
 
@@ -26,20 +25,31 @@ actions.send_keys(Keys.ENTER).perform()
 url = driver.current_url
 print (url)
 
-calendnext = driver.find_element_by_xpath("//button[contains(@class, 'calendar__next')]").click()
-dec1 = driver.find_element_by_xpath("//div[contains(@class, 'calendar__month-')][1]//div[contains(@class, 'calendar__week-')][1]/div[1]").click()
-time.sleep(1)
-dec2 = driver.find_element_by_xpath("//div[contains(@class, 'calendar__month-')][1]//div[contains(@class, 'calendar__week-')][1]/div[2]").click()
-time.sleep(1)
-ad1 = driver.find_element_by_xpath("//div[contains(@class, 'guest-wrapper__picker')][2]//button[contains(@class, 'number-ticker__control')][1]").click()
-time.sleep(1)
-aggiorna = driver.find_element_by_xpath("//button[text()='Aggiorna']").click()
-time.sleep(5)
+
+def calendar():
+    buttonarrive = driver.find_element_by_xpath("//button[contains(@class, 'button__green')]").click()
+    calendnext = driver.find_element_by_xpath("//button[contains(@class, 'calendar__next')]").click() #clicca sulla freccia avanti nel calendario
+    calendarweek = driver.find_elements_by_xpath("//div[contains(@class, 'calendar__day-')]") #settimane del calendario
+    for i in range(0,(len(calendarweek))):
+        calendarweek[i].click()
+        time.sleep(2)
+        ad = driver.find_elements_by_xpath("//button[contains(@class, 'number-ticker__control')][1]")
+        for i in range(0,(len(ad))):
+            ad[1].click() #clicca sul - per avere 1 adulto
+            time.sleep(2)
+            aggiorna = driver.find_element_by_xpath("//button[text()='Aggiorna']").click() #clicca su aggiorna per aggiornare la lista
+            time.sleep(5)
+        listnames()
+        listprices()
+        cambiopag()
 
 def listnames():
     hotelnames = driver.find_elements_by_xpath("//*[@class='listing_title']") #nomi hotel
     for i in range(0,(len(hotelnames))):
-        print((hotelnames[i].text))
+        links = driver.find_element_by_link_text(hotelnames[i].text).get_attribute('href')
+        print(hotelnames[i].text)
+        print(links)
+
 
 def listprices():
     hotelprice = driver.find_elements_by_xpath("//*[@class='price-wrap ']/div[position()=last()]") #prezzi
@@ -69,6 +79,8 @@ def cambiopag():
         listnames()
         listprices()
         page.click()
-        time.sleep(4)
-
-cambiopag()
+        time.sleep(10)
+        
+        
+        
+calendar()
