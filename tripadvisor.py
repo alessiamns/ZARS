@@ -1,3 +1,9 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# In[46]:
+
+
 import selenium
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
@@ -10,10 +16,14 @@ import requests
 import urllib.request
 import urllib.parse
 
+
+# In[47]:
+
+
 driver = webdriver.Chrome('chromedriver.exe')
 chrome_options = Options()
 driver.get("http://www.tripadvisor.it")
-hotels = driver.find_element_by_xpath("//div[@id='component_4']/div//span[1]/div") #hotels
+hotels = driver.find_element_by_xpath("//a[@href= '/Hotels']")
 
 actions = ActionChains(driver)
 actions.click(hotels) 
@@ -26,22 +36,25 @@ url = driver.current_url
 print (url)
 
 
+# In[70]:
+
+
 def calendar():
     buttonarrive = driver.find_element_by_xpath("//button[contains(@class, 'button__green')]").click()
     calendnext = driver.find_element_by_xpath("//button[contains(@class, 'calendar__next')]").click() #clicca sulla freccia avanti nel calendario
     calendarweek = driver.find_elements_by_xpath("//div[contains(@class, 'calendar__day-')]") #settimane del calendario
     for i in range(0,(len(calendarweek))):
         calendarweek[i].click()
-        time.sleep(2)
+        time.sleep(1)
         ad = driver.find_elements_by_xpath("//button[contains(@class, 'number-ticker__control')][1]")
         for i in range(0,(len(ad))):
-            ad[1].click() #clicca sul - per avere 1 adulto
+            ad[1].click() 
             time.sleep(2)
             aggiorna = driver.find_element_by_xpath("//button[text()='Aggiorna']").click() #clicca su aggiorna per aggiornare la lista
             time.sleep(5)
-        listnames()
-        listprices()
-        cambiopag()
+            listnames()
+            listprices()
+            cambiopag()
 
 def listnames():
     hotelnames = driver.find_elements_by_xpath("//*[@class='listing_title']") #nomi hotel
@@ -84,3 +97,16 @@ def cambiopag():
         
         
 calendar()
+
+
+# In[112]:
+
+
+driver.forward()
+
+
+# In[ ]:
+
+
+
+
