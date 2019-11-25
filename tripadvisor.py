@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[46]:
+# In[1]:
 
 
 import selenium
@@ -17,7 +17,7 @@ import urllib.request
 import urllib.parse
 
 
-# In[47]:
+# In[2]:
 
 
 driver = webdriver.Chrome('chromedriver.exe')
@@ -36,7 +36,7 @@ url = driver.current_url
 print (url)
 
 
-# In[70]:
+# In[60]:
 
 
 def calendar():
@@ -56,12 +56,24 @@ def calendar():
             listprices()
             cambiopag()
 
+
+# In[39]:
+
+
 def listnames():
     hotelnames = driver.find_elements_by_xpath("//*[@class='listing_title']") #nomi hotel
+    structuretype = driver.find_elements_by_xpath("//span[@class='label']")
+    infostructure = driver.find_elements_by_xpath("//div[@class='info-col']")
+    nonestructure = ("non specificato")
     for i in range(0,(len(hotelnames))):
-        links = driver.find_element_by_link_text(hotelnames[i].text).get_attribute('href')
-        print(hotelnames[i].text)
-        print(links)
+        #links = driver.find_element_by_link_text(hotelnames[i].text).get_attribute('href')
+        print(hotelnames[i].text) #nome struttura
+        #print(links)
+    for i in range(0,(len(structuretype))):
+        print (structuretype[i].text)  #tipologia di struttura
+
+
+# In[40]:
 
 
 def listprices():
@@ -80,7 +92,9 @@ def listprices():
     elif (len(notes)>0) :
         for i in range(0,(len(notes))):
             print (noprice)
-        
+
+
+# In[41]:
 
 
 def cambiopag():
@@ -95,14 +109,14 @@ def cambiopag():
         time.sleep(10)
         
         
-        
-calendar()
+cambiopag()        
+#calendar()
 
 
-# In[112]:
+# In[ ]:
 
 
-driver.forward()
+
 
 
 # In[ ]:
