@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[57]:
 
 
 import selenium
@@ -22,16 +22,17 @@ import mysql.connector
 from mysql.connector import Error
 
 
-# In[2]:
+# In[58]:
 
 
 driver = webdriver.Chrome('chromedriver.exe')
 wait = WebDriverWait(driver, 15)
 chrome_options = Options()
 driver.get("http://www.tripadvisor.it")
+driver.maximize_window()
 
 
-# In[3]:
+# In[59]:
 
 
 hotels = driver.find_element_by_xpath("//a[@href= '/Hotels']")
@@ -52,23 +53,7 @@ url = driver.current_url
 print (url)
 
 
-# In[38]:
-
-
-#creazione tabella strutture
-def strutture():
-    hotel_name = driver.find_element_by_xpath("//h1[contains(@class, 'hotel-review')]").text
-    #url_hotel = driver.current_url
-    address_hotel = driver.find_element_by_xpath("//div[@class='public-business-listing-ContactInfo__offer--KAFI4 public-business-listing-ContactInfo__atfInfo--3wJ1b']/span[2]").text
-    insert_table = "INSERT INTO strutture1 (NomeHotel, indirizzo) VALUES (%s, %s)"
-    
-    records_to_insert = [(hotel_name, address_hotel)]
-    cursor.executemany(insert_table, records_to_insert)
-    connection.commit()
-    print(cursor.rowcount, "Record in strutture1")
-
-
-# In[39]:
+# In[83]:
 
 
 #FUNZIONA
@@ -146,7 +131,7 @@ def recensioni():
             
 
 
-# In[40]:
+# In[84]:
 
 
 #FUNZIONA
@@ -157,29 +142,45 @@ def servizi():
     plus.click()
     #gestione servizi in una finestra
     active_services = driver.find_elements_by_xpath("//div[contains(@class, 'activeGroup')]//div[@class='hotels-hr-about-amenities-Amenity__amenity--3fbBj']")
-    
+    time.sleep(3)
     for i in range(0,(len(active_services))):
-        time.sleep(1)
+        time.sleep(3)
         first_service = active_services[i].text
         
         
-        insert_table = "REPLACE INTO servizi1 (Service) VALUES (%s)"
+        insert_table = "REPLACE INTO servizi (Service) VALUES (%s)"
         records_to_insert = (first_service, )
         cursor.execute(insert_table, records_to_insert)
         #soluzione per eliminare le stringhe vuote dalla tabella: effettuare una query
         #cursor.execute("DELETE FROM servizi1 WHERE Service = ''")
         connection.commit()
-    print(cursor.rowcount, "Record in servizi1")
+    print(cursor.rowcount, "Record in servizi")
     
     #a idservice viene aggiunto auto_increment dopo aver eliminato le stringhe vuote
     #cursor.execute("ALTER TABLE servizi1 CHANGE IDservice IDservice int(11) AUTO_INCREMENT")
-    cursor.execute("ALTER TABLE servizi1 AUTO_INCREMENT = 1")
+    cursor.execute("ALTER TABLE servizi AUTO_INCREMENT = 1")
     connection.commit()
 
     close_window = driver.find_element_by_xpath("//div[@role='button']").click()
 
 
-# In[41]:
+# In[85]:
+
+
+#creazione tabella strutture
+def strutture():
+    hotel_name = driver.find_element_by_xpath("//h1[contains(@class, 'hotel-review')]").text
+    #url_hotel = driver.current_url
+    address_hotel = driver.find_element_by_xpath("//div[@class='public-business-listing-ContactInfo__offer--KAFI4 public-business-listing-ContactInfo__atfInfo--3wJ1b']/span[2]").text
+    insert_table = "INSERT INTO strutture (NomeHotel, indirizzo) VALUES (%s, %s)"
+    
+    records_to_insert = [(hotel_name, address_hotel)]
+    cursor.executemany(insert_table, records_to_insert)
+    connection.commit()
+    print(cursor.rowcount, "Record in strutture")
+
+
+# In[86]:
 
 
 #connessione al db
@@ -193,27 +194,28 @@ try:
             )
     cursor = connection.cursor()
     
-    cursor.execute("CREATE TABLE strutture1 (IDhotel int(11) AUTO_INCREMENT PRIMARY KEY, NomeHotel VARCHAR(64), indirizzo VARCHAR(128)) ")
-    cursor.execute("CREATE TABLE servizi1 (IDservice int(11) UNIQUE , Service VARCHAR(64) PRIMARY KEY) ")
-    cursor.execute("CREATE TABLE recensioni (IDhotel int(11), NomeHotel VARCHAR(64), Recensione VARCHAR(512), Provenienza VARCHAR(64), DataSoggiorno VARCHAR(64), TipologiaViaggio VARCHAR(64), Lingua VARCHAR(64)) ")
+    cursor.execute("CREATE TABLE strutture (IDhotel int(11) AUTO_INCREMENT PRIMARY KEY, NomeHotel VARCHAR(64), indirizzo VARCHAR(128)) ")
+    cursor.execute("CREATE TABLE servizi (IDservice int(11) UNIQUE , Service VARCHAR(64) PRIMARY KEY) ")
+    cursor.execute("CREATE TABLE recensioni (ID_hotel int(11), NomeHotel VARCHAR(64), Recensione VARCHAR(512), Provenienza VARCHAR(64), DataSoggiorno VARCHAR(64), TipologiaViaggio VARCHAR(64), Lingua VARCHAR(64)) ")
     
     
-    urls = driver.find_elements_by_xpath("//a[@data-clicksource='HotelName']") #url
-      
+    
+    homepage = driver.window_handles[0]  
+    urls = driver.find_elements_by_xpath("//a[@data-clicksource='HotelName']") #url 
     for i in range(0,(len(urls))):
-        window_before = driver.window_handles[0]
         urls[i].click()
-        window_after = driver.window_handles[i+1]
+        window_after = driver.window_handles[1]
         driver.switch_to.window(window_after)
         time.sleep(3)
-    
         strutture()
         servizi()
         recensioni()
-        
-        
-        time.sleep(4)
-        driver.switch_to.window(window_before)
+        time.sleep(3)
+        driver.close()
+        driver.switch_to.window(homepage)
+    
+    
+    cursor.execute("CREATE TABLE provajoin SELECT strutture.IDhotel, recensioni.NomeHotel, recensioni.Recensione, recensioni.Provenienza, recensioni.DataSoggiorno FROM strutture RIGHT JOIN recensioni ON strutture.NomeHotel = recensioni.NomeHotel")
     
     
 except mysql.connector.Error as error:
@@ -226,7 +228,7 @@ finally:
         print("MySQL connection is closed")
 
 
-# In[37]:
+# In[82]:
 
 
 window_before = driver.window_handles[0]
