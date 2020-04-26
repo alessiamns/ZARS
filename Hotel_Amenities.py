@@ -8,33 +8,46 @@ from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.chrome.options import Options
 import time
 import re
-import requests
 import mysql.connector
 from mysql.connector import Error
+import argparse
+import sys
 
 options = Options()
 options.add_experimental_option("prefs", {"profile.default_content_setting_values.cookies": 2})
 driver = webdriver.Chrome(options=options)
 wait = WebDriverWait(driver, 15)
 
-driver.get("http://www.tripadvisor.it")
+
+driver.get("http://www.tripadvisor.it/Hotels")
 driver.maximize_window()
 
+parser = argparse.ArgumentParser(description='Where to?')
 
+parser.add_argument('-place', type=str, required=True, help='enter with the city name')
 
-hotels = driver.find_element_by_xpath("//div[@class='FWWB-VUV']//a[@href= '/Hotels']")
+args = parser.parse_args()
 
-hotels.click()
+ahead_input = driver.find_element_by_class_name("typeahead_input").click()
 
+time.sleep(1)
+
+input_search = driver.find_element_by_class_name("typeahead_input")
+input_search.send_keys(args.place)
 time.sleep(4)
+research = driver.find_element_by_xpath("//button[@id='SUBMIT_HOTELS']").click()
 
-input_name = driver.find_element_by_xpath("//input[@class='Smftgery']")
-input_name.send_keys("noto")
 time.sleep(3)
-input_name.send_keys(Keys.RETURN)
 
-time.sleep(2)
-driver.find_element_by_xpath("//div[@class='h1-container']").click()
+#close calendar
+view_calendar = wait.until(EC.element_to_be_clickable((By.CLASS_NAME, "_1HphCM4i")))
+element = driver.find_element_by_class_name("_1HphCM4i")
+driver.execute_script("arguments[0].style.position = 'initial';", element)
+
+
+time.sleep(3)
+
+
 
 
 #tabella servizi
@@ -69,7 +82,6 @@ def amenities():
     print(cursor.rowcount, "Record in amenities")
 
 
-# In[139]:
 
 
 #connessione al db

@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[76]:
-
-
 import selenium
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
@@ -14,42 +8,46 @@ from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.chrome.options import Options
 import time
 import re
-import requests
 import mysql.connector
 from mysql.connector import Error
-
-
-# In[77]:
-
+import argparse
+import sys
 
 options = Options()
 options.add_experimental_option("prefs", {"profile.default_content_setting_values.cookies": 2})
 driver = webdriver.Chrome(options=options)
 wait = WebDriverWait(driver, 15)
 
-driver.get("http://www.tripadvisor.it")
+
+driver.get("http://www.tripadvisor.it/Hotels")
 driver.maximize_window()
 
+parser = argparse.ArgumentParser(description='Where to?')
 
-# In[78]:
+parser.add_argument('-place', type=str, required=True, help='enter with the city name')
 
+args = parser.parse_args()
 
-hotels = driver.find_element_by_xpath("//div[@class='FWWB-VUV']//a[@href= '/Hotels']")
+ahead_input = driver.find_element_by_class_name("typeahead_input").click()
 
-hotels.click()
+time.sleep(1)
 
+input_search = driver.find_element_by_class_name("typeahead_input")
+input_search.send_keys(args.place)
 time.sleep(4)
+research = driver.find_element_by_xpath("//button[@id='SUBMIT_HOTELS']").click()
 
-input_name = driver.find_element_by_xpath("//input[@class='Smftgery']")
-input_name.send_keys("noto")
 time.sleep(3)
-input_name.send_keys(Keys.RETURN)
 
-time.sleep(2)
-driver.find_element_by_xpath("//div[@class='h1-container']").click()
+#close calendar
+view_calendar = wait.until(EC.element_to_be_clickable((By.CLASS_NAME, "_1HphCM4i")))
+element = driver.find_element_by_class_name("_1HphCM4i")
+driver.execute_script("arguments[0].style.position = 'initial';", element)
 
 
-# In[88]:
+time.sleep(3)
+
+
 
 
 def info():
@@ -66,15 +64,14 @@ def info():
     review_count = driver.find_element_by_xpath("//div[contains(@class, 'ratingContainer')]//span[contains(@class, 'reviewCount')]").text
 
     popular_index = driver.find_element_by_xpath("//div[contains(@class, 'popIndex')]").text
+    
+    time.sleep(2)
 
     insert_table = "INSERT INTO info (Name, Address, Rating, Review_Count, Popular_Index) VALUES (%s, %s, %s, %s, %s)"
     records_to_insert = [(hotel_name, address, rating, review_count, popular_index)]
     cursor.executemany(insert_table, records_to_insert)
     connection.commit()
     print(cursor.rowcount, "Record in Hotel_Info")
-
-
-# In[89]:
 
 
 #connessione al db
@@ -94,28 +91,18 @@ try:
     homepage = driver.window_handles[0]  
     #view_urls = wait.until(EC.element_to_be_clickable((By.XPATH, "//a[@data-clicksource='HotelName']")))
     urls = driver.find_elements_by_xpath("//a[@data-clicksource='HotelName']") #url 
+    driver.find_element_by_xpath("//div[@class='h1-container']").click()
+    time.sleep(2)
     for i in range(0,(len(urls))):
-        try:
-            category = driver.find_element_by_xpath("//div[contains(@class, 'accommodation_category')]").text
-            urls[i].click()
-            window_after = driver.window_handles[1]
-            driver.switch_to.window(window_after)
-            time.sleep(3)
-            info()
-            time.sleep(3)
-            driver.close()
-            driver.switch_to.window(homepage)
-            time.sleep(5)
-        except:
-            urls[i].click()
-            window_after = driver.window_handles[1]
-            driver.switch_to.window(window_after)
-            time.sleep(3)
-            info()
-            time.sleep(3)
-            driver.close()
-            driver.switch_to.window(homepage)
-            time.sleep(5)
+        urls[i].click()
+        window_after = driver.window_handles[1]
+        driver.switch_to.window(window_after)
+        time.sleep(4)
+        info()
+        time.sleep(4)
+        driver.close()
+        driver.switch_to.window(homepage)
+        time.sleep(5)
             
         
     
@@ -129,15 +116,11 @@ finally:
         print("MySQL connection is closed")
 
 
-# In[87]:
 
 
+#window_before = driver.window_handles[0]
+#driver.switch_to.window(window_before)
 
-window_before = driver.window_handles[0]
-driver.switch_to.window(window_before)
-
-
-# In[ ]:
 
 
 

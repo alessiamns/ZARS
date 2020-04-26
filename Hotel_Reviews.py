@@ -8,51 +8,69 @@ from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.chrome.options import Options
 import time
 import re
-import requests
 import mysql.connector
 from mysql.connector import Error
+import argparse
+import sys
 
 options = Options()
 options.add_experimental_option("prefs", {"profile.default_content_setting_values.cookies": 2})
 driver = webdriver.Chrome(options=options)
 wait = WebDriverWait(driver, 15)
 
-driver.get("http://www.tripadvisor.it")
+
+driver.get("http://www.tripadvisor.it/Hotels")
 driver.maximize_window()
 
+parser = argparse.ArgumentParser(description='Where to?')
 
-hotels = driver.find_element_by_xpath("//div[@class='FWWB-VUV']//a[@href= '/Hotels']")
+parser.add_argument('-place', type=str, required=True, help='enter with the city name')
 
-hotels.click()
+args = parser.parse_args()
 
+ahead_input = driver.find_element_by_class_name("typeahead_input").click()
+
+time.sleep(1)
+
+input_search = driver.find_element_by_class_name("typeahead_input")
+input_search.send_keys(args.place)
 time.sleep(4)
+research = driver.find_element_by_xpath("//button[@id='SUBMIT_HOTELS']").click()
 
-input_name = driver.find_element_by_xpath("//input[@class='Smftgery']")
-input_name.send_keys("noto")
 time.sleep(3)
-input_name.send_keys(Keys.RETURN)
 
-time.sleep(2)
-driver.find_element_by_xpath("//div[@class='h1-container']").click()
+#close calendar
+view_calendar = wait.until(EC.element_to_be_clickable((By.CLASS_NAME, "_1HphCM4i")))
+element = driver.find_element_by_class_name("_1HphCM4i")
+driver.execute_script("arguments[0].style.position = 'initial';", element)
+
+
+time.sleep(3)
+
+
 
 
 #function reviews: property name, rating, review, hometown, date, triptype for each property
 def reviews():
     
     hotel_name = driver.find_element_by_xpath("//h1[contains(@class, 'hotel-review')]").text #nome hotel
-    go_review = driver.find_element_by_xpath("//span[contains(@class, 'reviewCount')]").click() #su per scendere giu alle recensioni
+    go_review = driver.find_element_by_xpath("//span[contains(@class, 'reviewCount')]")
+    go_review.click() #su per scendere giu alle recensioni
     
     time_page = wait.until(EC.element_to_be_clickable((By.XPATH, "//a[contains(@class, 'pageNum')]")))
     number_pages = driver.find_element_by_xpath("//a[contains(@class, 'pageNum')][position() = last()]").text
     pages = int(number_pages) #numero di pagine
     
     for j in range(0,pages): #ciclo per tutte le pagine
-        insert_table = "INSERT INTO reviews (Name, Rating, Review, Hometown, Date of stay, Trip type) VALUES (%s, %s, %s, %s, %s, %s)"
+        insert_table = "INSERT INTO reviews (Name, Rating, Review, Hometown, Date_of_stay, Trip_type) VALUES (%s, %s, %s, %s, %s, %s)"
         
         if j < (pages-1): #condizione per tutte le pagine tranne l'ultima
             go_on = driver.find_element_by_xpath("//a[contains(text(),'Avanti')]") #scorre le pagine
-            language = driver.find_element_by_xpath("//span[contains(text(),'Italiano')]").click() #lingua selezionata
-            info_plus = driver.find_element_by_xpath("//div[contains(@class,'Expandable')]//span[contains(text(),'Scopri di pi')]").click() #clicca per espandere
+            language = driver.find_element_by_xpath("//span[contains(text(),'Italiano')]")
+            language.click() #lingua selezionata
+            view_plus = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[contains(@class,'Expandable')]//span[contains(text(),'Scopri di pi')]")))
+            info_plus = driver.find_element_by_xpath("//div[contains(@class,'Expandable')]//span[contains(text(),'Scopri di pi')]")
+            info_plus.click() #clicca per espandere
             time.sleep(1)
             all_reviews = driver.find_elements_by_xpath("//q[contains(@class, 'location-review')]") #recensioni
             
@@ -91,8 +109,11 @@ def reviews():
         
         else: #condizione per l'ultima pagina
             
-            language = driver.find_element_by_xpath("//span[contains(text(),'Italiano')]").click()
-            info_plus = driver.find_element_by_xpath("//div[contains(@class, 'location-review')]//span[contains(text(),'Scopri di pi')]").click() #clicca per espandere
+            language = driver.find_element_by_xpath("//span[contains(text(),'Italiano')]")
+            language.click()
+            view_plus = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[contains(@class,'Expandable')]//span[contains(text(),'Scopri di pi')]")))
+            info_plus = driver.find_element_by_xpath("//div[contains(@class, 'location-review')]//span[contains(text(),'Scopri di pi')]")
+            info_plus.click() #clicca per espandere
             time.sleep(1)
             all_reviews = driver.find_elements_by_xpath("//q[contains(@class, 'location-review')]")
             for i in range(0,(len(all_reviews))):
@@ -139,7 +160,7 @@ try:
             )
     cursor = connection.cursor()
     
-    cursor.execute("CREATE TABLE reviews (ID_hotel int(11), Name VARCHAR(64), Rating int(2), Review VARCHAR(512), Hometown VARCHAR(64), Date of stay VARCHAR(64), Trip type VARCHAR(64), Language VARCHAR(64)) ")
+    cursor.execute("CREATE TABLE reviews (ID_hotel int(11), Name VARCHAR(64), Rating int(2), Review VARCHAR(512), Hometown VARCHAR(64), Date_of_stay VARCHAR(64), Trip_type VARCHAR(64), Language VARCHAR(64)) ")
     
     
     
