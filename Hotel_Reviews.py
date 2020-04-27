@@ -10,6 +10,7 @@ import time
 import re
 import mysql.connector
 from mysql.connector import Error
+from mysql.connector import errorcode
 import argparse
 import sys
 
