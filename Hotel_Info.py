@@ -48,8 +48,6 @@ driver.execute_script("arguments[0].style.position = 'initial';", element)
 time.sleep(3)
 
 
-
-
 def info():
     hotel_name = driver.find_element_by_xpath("//h1[contains(@class, 'hotel-review')]").text #nome hotel
     
@@ -87,22 +85,49 @@ try:
     
     cursor.execute("CREATE TABLE info (Name VARCHAR(64), Address VARCHAR(512), Rating VARCHAR(4), Review_Count VARCHAR(64), Popular_Index VARCHAR(64))") 
     
+
+
+    time_page = wait.until(EC.element_to_be_clickable((By.XPATH, "//a[contains(@class, 'pageNum')]")))
+    number_pages = driver.find_element_by_xpath("//a[contains(@class, 'pageNum')][position() = last()]").text
+    pages = int(number_pages) #numero di pagine
+
+    for j in range(0,pages): #ciclo per tutte le pagine
+        homepage = driver.window_handles[0]  
+        #view_urls = wait.until(EC.element_to_be_clickable((By.XPATH, "//a[@data-clicksource='HotelName']")))
+        urls = driver.find_elements_by_xpath("//a[@data-clicksource='HotelName']") #url 
+        driver.find_element_by_xpath("//div[@class='h1-container']").click()
+        time.sleep(2)
+        if j < (pages-1):
+            go_on = driver.find_element_by_xpath("//a[contains(text(),'Avanti')]") #scorre le pagine
+            time.sleep(2)
+            for i in range(0,(len(urls))):
+                urls[i].click()
+                window_after = driver.window_handles[1]
+                driver.switch_to.window(window_after)
+                time.sleep(4)
+                info()
+                time.sleep(4)
+                driver.close()
+                driver.switch_to.window(homepage)
+                time.sleep(5)
+            go_on.click()
+            time.sleep(5)  
+        else:
+            for i in range(0,(len(urls))):
+                urls[i].click()
+                window_after = driver.window_handles[1]
+                driver.switch_to.window(window_after)
+                time.sleep(4)
+                info()
+                time.sleep(4)
+                driver.close()
+                driver.switch_to.window(homepage)
+                time.sleep(5)
+                
+            
     
-    homepage = driver.window_handles[0]  
-    #view_urls = wait.until(EC.element_to_be_clickable((By.XPATH, "//a[@data-clicksource='HotelName']")))
-    urls = driver.find_elements_by_xpath("//a[@data-clicksource='HotelName']") #url 
-    driver.find_element_by_xpath("//div[@class='h1-container']").click()
-    time.sleep(2)
-    for i in range(0,(len(urls))):
-        urls[i].click()
-        window_after = driver.window_handles[1]
-        driver.switch_to.window(window_after)
-        time.sleep(4)
-        info()
-        time.sleep(4)
-        driver.close()
-        driver.switch_to.window(homepage)
-        time.sleep(5)
+    
+    
             
         
     

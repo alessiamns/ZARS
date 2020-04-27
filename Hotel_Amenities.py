@@ -66,7 +66,8 @@ def amenities():
             insert_table = "INSERT INTO amenities (Name, Amenity) VALUES (%s, %s)"
             records_to_insert = [(hotel_name, amenity_hotel)]
             cursor.executemany(insert_table, records_to_insert)
-        close_window = driver.find_element_by_xpath("//div[@role='button']").click()
+        close_window = driver.find_element_by_xpath("//div[@role='button']")
+        close_window.click()
         
     except:
         active_amenities = driver.find_elements_by_xpath("//div[contains(@class, 'AmenityGroup')][1]//div[contains(@class, 'Amenity')]")
@@ -98,19 +99,43 @@ try:
     cursor.execute("CREATE TABLE amenities (Name VARCHAR(64), Amenity VARCHAR(64)) ")    
     
     
-    homepage = driver.window_handles[0]  
-    #view_urls = wait.until(EC.element_to_be_clickable((By.XPATH, "//a[@data-clicksource='HotelName']")))
-    urls = driver.find_elements_by_xpath("//a[@data-clicksource='HotelName']") #url 
-    for i in range(0,(len(urls))):
-        urls[i].click()
-        window_after = driver.window_handles[1]
-        driver.switch_to.window(window_after)
-        time.sleep(3)
-        amenities()
-        time.sleep(3)
-        driver.close()
-        driver.switch_to.window(homepage)
-        time.sleep(5)
+    time_page = wait.until(EC.element_to_be_clickable((By.XPATH, "//a[contains(@class, 'pageNum')]")))
+    number_pages = driver.find_element_by_xpath("//a[contains(@class, 'pageNum')][position() = last()]").text
+    pages = int(number_pages) #numero di pagine
+
+    for j in range(0,pages): #ciclo per tutte le pagine
+        homepage = driver.window_handles[0]  
+        #view_urls = wait.until(EC.element_to_be_clickable((By.XPATH, "//a[@data-clicksource='HotelName']")))
+        urls = driver.find_elements_by_xpath("//a[@data-clicksource='HotelName']") #url 
+        driver.find_element_by_xpath("//div[@class='h1-container']").click()
+        time.sleep(2)
+        if j < (pages-1):
+            go_on = driver.find_element_by_xpath("//a[contains(text(),'Avanti')]") #scorre le pagine
+            time.sleep(2)
+            for i in range(0,(len(urls))):
+                urls[i].click()
+                window_after = driver.window_handles[1]
+                driver.switch_to.window(window_after)
+                time.sleep(4)
+                amenities()
+                time.sleep(4)
+                driver.close()
+                driver.switch_to.window(homepage)
+                time.sleep(5)
+            go_on.click()
+            time.sleep(5)  
+        else:
+            for i in range(0,(len(urls))):
+                urls[i].click()
+                window_after = driver.window_handles[1]
+                driver.switch_to.window(window_after)
+                time.sleep(4)
+                amenities()
+                time.sleep(4)
+                driver.close()
+                driver.switch_to.window(homepage)
+                time.sleep(5)
+                
         
     
 except mysql.connector.Error as error:

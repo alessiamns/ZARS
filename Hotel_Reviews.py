@@ -163,19 +163,42 @@ try:
     cursor.execute("CREATE TABLE reviews (ID_hotel int(11), Name VARCHAR(64), Rating int(2), Review VARCHAR(512), Hometown VARCHAR(64), Date_of_stay VARCHAR(64), Trip_type VARCHAR(64), Language VARCHAR(64)) ")
     
     
-    
-    homepage = driver.window_handles[0]  
-    urls = driver.find_elements_by_xpath("//a[@data-clicksource='HotelName']") #url 
-    for i in range(0,(len(urls))):
-        urls[i].click()
-        window_after = driver.window_handles[1]
-        driver.switch_to.window(window_after)
-        time.sleep(3)
-        reviews()
-        time.sleep(3)
-        driver.close()
-        driver.switch_to.window(homepage)
-        time.sleep(7)
+    time_page = wait.until(EC.element_to_be_clickable((By.XPATH, "//a[contains(@class, 'pageNum')]")))
+    number_pages = driver.find_element_by_xpath("//a[contains(@class, 'pageNum')][position() = last()]").text
+    pages = int(number_pages) #numero di pagine
+
+    for j in range(0,pages): #ciclo per tutte le pagine
+        homepage = driver.window_handles[0]  
+        #view_urls = wait.until(EC.element_to_be_clickable((By.XPATH, "//a[@data-clicksource='HotelName']")))
+        urls = driver.find_elements_by_xpath("//a[@data-clicksource='HotelName']") #url 
+        driver.find_element_by_xpath("//div[@class='h1-container']").click()
+        time.sleep(2)
+        if j < (pages-1):
+            go_on = driver.find_element_by_xpath("//a[contains(text(),'Avanti')]") #scorre le pagine
+            time.sleep(2)
+            for i in range(0,(len(urls))):
+                urls[i].click()
+                window_after = driver.window_handles[1]
+                driver.switch_to.window(window_after)
+                time.sleep(4)
+                reviews()
+                time.sleep(4)
+                driver.close()
+                driver.switch_to.window(homepage)
+                time.sleep(5)
+            go_on.click()
+            time.sleep(5)  
+        else:
+            for i in range(0,(len(urls))):
+                urls[i].click()
+                window_after = driver.window_handles[1]
+                driver.switch_to.window(window_after)
+                time.sleep(4)
+                reviews()
+                time.sleep(4)
+                driver.close()
+                driver.switch_to.window(homepage)
+                time.sleep(5)
     
     
     
