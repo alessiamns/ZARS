@@ -10,6 +10,7 @@ import time
 import re
 import mysql.connector
 from mysql.connector import Error
+from mysql.connector import errorcode
 import argparse
 import sys
 
@@ -18,16 +19,14 @@ options.add_experimental_option("prefs", {"profile.default_content_setting_value
 driver = webdriver.Chrome(options=options)
 wait = WebDriverWait(driver, 15)
 
-
+#get url
 driver.get("http://www.tripadvisor.it/Hotels")
 driver.maximize_window()
 
+#search destination
 parser = argparse.ArgumentParser(description='Where to?')
-
 parser.add_argument('-place', type=str, required=True, help='enter with the city name')
-
 args = parser.parse_args()
-
 ahead_input = driver.find_element_by_class_name("typeahead_input").click()
 
 time.sleep(1)
@@ -48,11 +47,14 @@ driver.execute_script("arguments[0].style.position = 'initial';", element)
 time.sleep(3)
 
 
+
+#function info
 def info():
-    hotel_name = driver.find_element_by_xpath("//h1[contains(@class, 'hotel-review')]").text #nome hotel
+    hotel_name = driver.find_element_by_xpath("//h1[contains(@class, 'hotel-review')]").text
     
     address = driver.find_element_by_xpath("//div[contains(@class, 'ListingEntry')]//span[contains(@class, 'ContactInfo')][2]").text
     
+    #rating value
     rating_value = driver.find_element_by_xpath("//div[contains(@class, 'ratingContainer')]//span[contains(@class, 'ui_bubble')]")
     rating_class = rating_value.get_attribute("class")
     value_rating = rating_class[-2:]
@@ -72,40 +74,61 @@ def info():
     print(cursor.rowcount, "Record in Hotel_Info")
 
 
-#connessione al db
+#connection
 try:
-        
+    
+    db = "ota"+ "_" + str(args.place)
+
+
     connection = mysql.connector.connect(
         host="localhost",
         user="root",
         passwd="",
-        database="ota"
             )
     cursor = connection.cursor()
+
+    def create_db(cursor):
+        try:
+            cursor.execute("CREATE DATABASE {} DEFAULT CHARACTER SET 'utf8'".format(db))
+        except mysql.connector.Error as error:
+            print("Failed creating database: {}".format(error))
+            exit(1)
+
+    try:
+        cursor.execute("USE {}".format(db))
+    except mysql.connector.Error as error:
+        print("Database {} does not exists.".format(db))
+        if error.errno == errorcode.ER_BAD_DB_ERROR:
+            create_db(cursor)
+            print("Database {} created successfully.".format(db))
+            connection.database = db
+        else:
+            print(error)
+            exit(1)
     
     cursor.execute("CREATE TABLE info (Name VARCHAR(64), Address VARCHAR(512), Rating VARCHAR(4), Review_Count VARCHAR(64), Popular_Index VARCHAR(64))") 
     
 
-
+    #manage page
     time_page = wait.until(EC.element_to_be_clickable((By.XPATH, "//a[contains(@class, 'pageNum')]")))
     number_pages = driver.find_element_by_xpath("//a[contains(@class, 'pageNum')][position() = last()]").text
-    pages = int(number_pages) #numero di pagine
+    pages = int(number_pages)  #conversion
 
-    for j in range(0,pages): #ciclo per tutte le pagine
+    for j in range(0,pages): 
         homepage = driver.window_handles[0]  
         #view_urls = wait.until(EC.element_to_be_clickable((By.XPATH, "//a[@data-clicksource='HotelName']")))
         urls = driver.find_elements_by_xpath("//a[@data-clicksource='HotelName']") #url 
         driver.find_element_by_xpath("//div[@class='h1-container']").click()
         time.sleep(2)
         if j < (pages-1):
-            go_on = driver.find_element_by_xpath("//a[contains(text(),'Avanti')]") #scorre le pagine
+            go_on = driver.find_element_by_xpath("//a[contains(text(),'Avanti')]") #button
             time.sleep(2)
             for i in range(0,(len(urls))):
                 urls[i].click()
                 window_after = driver.window_handles[1]
                 driver.switch_to.window(window_after)
                 time.sleep(4)
-                info()
+                info() #call the function defined
                 time.sleep(4)
                 driver.close()
                 driver.switch_to.window(homepage)
@@ -118,7 +141,7 @@ try:
                 window_after = driver.window_handles[1]
                 driver.switch_to.window(window_after)
                 time.sleep(4)
-                info()
+                info() #call the function defined
                 time.sleep(4)
                 driver.close()
                 driver.switch_to.window(homepage)

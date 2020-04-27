@@ -18,16 +18,14 @@ options.add_experimental_option("prefs", {"profile.default_content_setting_value
 driver = webdriver.Chrome(options=options)
 wait = WebDriverWait(driver, 15)
 
-
+#get url
 driver.get("http://www.tripadvisor.it/Hotels")
 driver.maximize_window()
 
+#search destination
 parser = argparse.ArgumentParser(description='Where to?')
-
-parser.add_argument('-place', type=str, required=True, help='enter with the city name')
-
+parser.add_argument('-place', type=str, required=True, help='search destination')
 args = parser.parse_args()
-
 ahead_input = driver.find_element_by_class_name("typeahead_input").click()
 
 time.sleep(1)
@@ -49,8 +47,7 @@ time.sleep(3)
 
 
 
-
-#tabella servizi
+#function amenities
 def amenities():
     hotel_name = driver.find_element_by_xpath("//h1[contains(@class, 'hotel-review')]").text
     try:
@@ -77,7 +74,7 @@ def amenities():
             insert_table = "INSERT INTO amenities (Name, Amenity) VALUES (%s, %s)"
             records_to_insert = [(hotel_name, amenity_hotel)]
             cursor.executemany(insert_table, records_to_insert)
-    #soluzione per eliminare le stringhe vuote dalla tabella: effettuare una query
+    #delete empty strings
     cursor.execute("DELETE FROM amenities WHERE Amenity = ''")
     connection.commit()
     print(cursor.rowcount, "Record in amenities")
@@ -85,39 +82,61 @@ def amenities():
 
 
 
-#connessione al db
+#connection
 try:
-        
+    
+    db = "ota"+ "_" + str(args.place)
+
+
     connection = mysql.connector.connect(
         host="localhost",
         user="root",
         passwd="",
-        database="ota"
             )
     cursor = connection.cursor()
+
+    def create_db(cursor):
+        try:
+            cursor.execute("CREATE DATABASE {} DEFAULT CHARACTER SET 'utf8'".format(db))
+        except mysql.connector.Error as error:
+            print("Failed creating database: {}".format(error))
+            exit(1)
+
+    try:
+        cursor.execute("USE {}".format(db))
+    except mysql.connector.Error as error:
+        print("Database {} does not exists.".format(db))
+        if error.errno == errorcode.ER_BAD_DB_ERROR:
+            create_db(cursor)
+            print("Database {} created successfully.".format(db))
+            connection.database = db
+        else:
+            print(error)
+            exit(1)
+    
     
     cursor.execute("CREATE TABLE amenities (Name VARCHAR(64), Amenity VARCHAR(64)) ")    
     
-    
+    #manage pages
     time_page = wait.until(EC.element_to_be_clickable((By.XPATH, "//a[contains(@class, 'pageNum')]")))
     number_pages = driver.find_element_by_xpath("//a[contains(@class, 'pageNum')][position() = last()]").text
-    pages = int(number_pages) #numero di pagine
+    pages = int(number_pages) #conversion
 
-    for j in range(0,pages): #ciclo per tutte le pagine
+    for j in range(0,pages):
         homepage = driver.window_handles[0]  
         #view_urls = wait.until(EC.element_to_be_clickable((By.XPATH, "//a[@data-clicksource='HotelName']")))
         urls = driver.find_elements_by_xpath("//a[@data-clicksource='HotelName']") #url 
         driver.find_element_by_xpath("//div[@class='h1-container']").click()
         time.sleep(2)
         if j < (pages-1):
-            go_on = driver.find_element_by_xpath("//a[contains(text(),'Avanti')]") #scorre le pagine
+            go_on = driver.find_element_by_xpath("//a[contains(text(),'Avanti')]") #button
             time.sleep(2)
             for i in range(0,(len(urls))):
                 urls[i].click()
                 window_after = driver.window_handles[1]
                 driver.switch_to.window(window_after)
                 time.sleep(4)
-                amenities()
+                amenities() #call the function defined
                 time.sleep(4)
                 driver.close()
                 driver.switch_to.window(homepage)
@@ -130,7 +149,7 @@ try:
                 window_after = driver.window_handles[1]
                 driver.switch_to.window(window_after)
                 time.sleep(4)
-                amenities()
+                amenities() #call the function defined
                 time.sleep(4)
                 driver.close()
                 driver.switch_to.window(homepage)
