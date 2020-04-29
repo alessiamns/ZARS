@@ -23,8 +23,8 @@ wait = WebDriverWait(driver, 15)
 driver.get("http://www.tripadvisor.it/Hotels")
 driver.maximize_window()
 
-#search destination
-parser = argparse.ArgumentParser(description='Where to?')
+parser = argparse.ArgumentParser()
+parser.add_argument('-pr', type=int, help='enter number pages reviews')
 parser.add_argument('-place', type=str, required=True, help='enter with the city name')
 args = parser.parse_args()
 ahead_input = driver.find_element_by_class_name("typeahead_input").click()
@@ -57,12 +57,15 @@ def reviews():
     
     time_page = wait.until(EC.element_to_be_clickable((By.XPATH, "//a[contains(@class, 'pageNum')]")))
     number_pages = driver.find_element_by_xpath("//a[contains(@class, 'pageNum')][position() = last()]").text
-    pages = int(number_pages) #conversion
+    pages_review = int(number_pages) #conversion
+
+    if args.pr:
+        pages_review = args.pr
     
-    for j in range(0,pages): 
+    for j in range(0,pages_review): 
         insert_table = "INSERT INTO reviews (Name, Rating, Review, Hometown, Date_of_stay, Trip_type) VALUES (%s, %s, %s, %s, %s, %s)"
         
-        if j < (pages-1): 
+        if j < (pages_review-1): 
             go_on = driver.find_element_by_xpath("//a[contains(text(),'Avanti')]") #button
             language = driver.find_element_by_xpath("//span[contains(text(),'Italiano')]")
             language.click() #language

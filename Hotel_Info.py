@@ -23,9 +23,9 @@ wait = WebDriverWait(driver, 15)
 driver.get("http://www.tripadvisor.it/Hotels")
 driver.maximize_window()
 
-#search destination
-parser = argparse.ArgumentParser(description='Where to?')
+parser = argparse.ArgumentParser()
 parser.add_argument('-place', type=str, required=True, help='enter with the city name')
+parser.add_argument('-pages', type=int, help='enter number pages')
 args = parser.parse_args()
 ahead_input = driver.find_element_by_class_name("typeahead_input").click()
 
@@ -51,21 +51,22 @@ time.sleep(3)
 #function info
 def info():
     hotel_name = driver.find_element_by_xpath("//h1[contains(@class, 'hotel-review')]").text
-    
-    address = driver.find_element_by_xpath("//div[contains(@class, 'ListingEntry')]//span[contains(@class, 'ContactInfo')][2]").text
-    
-    #rating value
-    rating_value = driver.find_element_by_xpath("//div[contains(@class, 'ratingContainer')]//span[contains(@class, 'ui_bubble')]")
-    rating_class = rating_value.get_attribute("class")
-    value_rating = rating_class[-2:]
-    float_rating = value_rating[:1] + '.' + value_rating[1:]
-    rating = float_rating
-
-    review_count = driver.find_element_by_xpath("//div[contains(@class, 'ratingContainer')]//span[contains(@class, 'reviewCount')]").text
-
-    popular_index = driver.find_element_by_xpath("//div[contains(@class, 'popIndex')]").text
-    
-    time.sleep(2)
+    try:
+        address = driver.find_element_by_xpath("//div[contains(@class, 'ListingEntry')]//span[contains(@class, 'ContactInfo')][2]").text
+        #rating value
+        rating_value = driver.find_element_by_xpath("//div[contains(@class, 'ratingContainer')]//span[contains(@class, 'ui_bubble')]")
+        rating_class = rating_value.get_attribute("class")
+        value_rating = rating_class[-2:]
+        float_rating = value_rating[:1] + '.' + value_rating[1:]
+        rating = float_rating
+        review_count = driver.find_element_by_xpath("//div[contains(@class, 'ratingContainer')]//span[contains(@class, 'reviewCount')]").text
+        popular_index = driver.find_element_by_xpath("//div[contains(@class, 'popIndex')]").text
+        time.sleep(2)
+    except:
+        address = ""
+        rating = ""
+        review_count = ""
+        popular_index = ""
 
     insert_table = "INSERT INTO info (Name, Address, Rating, Review_Count, Popular_Index) VALUES (%s, %s, %s, %s, %s)"
     records_to_insert = [(hotel_name, address, rating, review_count, popular_index)]
@@ -73,10 +74,10 @@ def info():
     connection.commit()
     print(cursor.rowcount, "Record in Hotel_Info")
 
-
 #connection
 try:
     
+    #db city name
     db = "ota"+ "_" + str(args.place)
 
 
@@ -113,6 +114,9 @@ try:
     time_page = wait.until(EC.element_to_be_clickable((By.XPATH, "//a[contains(@class, 'pageNum')]")))
     number_pages = driver.find_element_by_xpath("//a[contains(@class, 'pageNum')][position() = last()]").text
     pages = int(number_pages)  #conversion
+
+    if args.pages:
+        pages = args.pages
 
     for j in range(0,pages): 
         homepage = driver.window_handles[0]  
