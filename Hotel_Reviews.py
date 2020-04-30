@@ -183,7 +183,7 @@ try:
             exit(1)
     
     
-    cursor.execute("CREATE TABLE reviews (ID_hotel int(11), Name VARCHAR(64), Rating int(2), Review VARCHAR(512), Hometown VARCHAR(64), Date_of_stay VARCHAR(64), Trip_type VARCHAR(64), Language VARCHAR(64)) ")
+    cursor.execute("CREATE TABLE reviews (ID_hotel int(11), Name VARCHAR(64) NOT NULL, Rating int(2), Review VARCHAR(512), Hometown VARCHAR(64), Date_of_stay VARCHAR(64), Trip_type VARCHAR(64), Language VARCHAR(64)) ")
     
     #manage pages
     time_page = wait.until(EC.element_to_be_clickable((By.XPATH, "//a[contains(@class, 'pageNum')]")))
@@ -222,6 +222,7 @@ try:
                 driver.close()
                 driver.switch_to.window(homepage)
                 time.sleep(5)
+    driver.quit()
     
     
     

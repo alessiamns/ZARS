@@ -107,7 +107,7 @@ try:
             print(error)
             exit(1)
     
-    cursor.execute("CREATE TABLE info (Name VARCHAR(64), Address VARCHAR(512), Rating VARCHAR(4), Review_Count VARCHAR(64), Popular_Index VARCHAR(64))") 
+    cursor.execute("CREATE TABLE info (ID int NOT NULL AUTO_INCREMENT, Name VARCHAR(64) NOT NULL, Address VARCHAR(512), Rating VARCHAR(4), Review_Count VARCHAR(64), Popular_Index VARCHAR(64), PRIMARY KEY(ID))") 
     
 
     #manage page
@@ -150,6 +150,7 @@ try:
                 driver.close()
                 driver.switch_to.window(homepage)
                 time.sleep(5)
+    driver.quit()
                 
             
     

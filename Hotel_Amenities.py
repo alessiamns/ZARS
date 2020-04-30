@@ -40,7 +40,7 @@ research = driver.find_element_by_xpath("//button[@id='SUBMIT_HOTELS']").click()
 time.sleep(3)
 
 #close calendar
-view_calendar = wait.until(EC.element_to_be_clickable((By.CLASS_NAME, "_1HphCM4i")))
+wait.until(EC.element_to_be_clickable((By.CLASS_NAME, "_1HphCM4i")))
 element = driver.find_element_by_class_name("_1HphCM4i")
 driver.execute_script("arguments[0].style.position = 'initial';", element)
 
@@ -53,8 +53,9 @@ time.sleep(3)
 def amenities():
     hotel_name = driver.find_element_by_xpath("//h1[contains(@class, 'hotel-review')]").text
     try:
-        view_plus = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[@class='ssr-init-26f']/*[2]/following-sibling::*[1]")))
-        plus = driver.find_element_by_xpath("//div[@class='ssr-init-26f']/*[2]/following-sibling::*[1]").click()
+        plus = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[@class='ssr-init-26f']/*[2]/following-sibling::*[1]")))
+        #plus = driver.find_element_by_xpath("//div[@class='ssr-init-26f']/*[2]/following-sibling::*[1]")
+        plus.click()
         #gestione servizi in una finestra
         active_amenities = driver.find_elements_by_xpath("//div[contains(@class, 'activeGroup')]//div[contains(@class,'amenity--3fbBj')]")
         time.sleep(3)
@@ -117,7 +118,7 @@ try:
             exit(1)
     
     
-    cursor.execute("CREATE TABLE amenities (Name VARCHAR(64), Amenity VARCHAR(64)) ")    
+    cursor.execute("CREATE TABLE amenities (Name VARCHAR(64) NOT NULL, Amenity VARCHAR(64)) ")    
     
     #manage pages
     time_page = wait.until(EC.element_to_be_clickable((By.XPATH, "//a[contains(@class, 'pageNum')]")))
@@ -129,7 +130,7 @@ try:
 
     for j in range(0,pages):
         homepage = driver.window_handles[0]  
-        #view_urls = wait.until(EC.element_to_be_clickable((By.XPATH, "//a[@data-clicksource='HotelName']")))
+        wait.until(EC.element_to_be_clickable((By.XPATH, "//a[@data-clicksource='HotelName']")))
         urls = driver.find_elements_by_xpath("//a[@data-clicksource='HotelName']") #url 
         driver.find_element_by_xpath("//div[@class='h1-container']").click()
         time.sleep(2)
@@ -159,7 +160,7 @@ try:
                 driver.close()
                 driver.switch_to.window(homepage)
                 time.sleep(5)
-                
+    driver.quit()           
         
     
 except mysql.connector.Error as error:
