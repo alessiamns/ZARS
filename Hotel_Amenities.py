@@ -80,7 +80,7 @@ def amenities():
     #delete empty strings
     cursor.execute("DELETE FROM amenities WHERE Amenity = ''")
     connection.commit()
-    print(cursor.rowcount, "Record in amenities")
+    print(cursor.rowcount, "record in Amenities")
 
 
 

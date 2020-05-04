@@ -26,6 +26,7 @@ driver.maximize_window()
 parser = argparse.ArgumentParser()
 parser.add_argument('-pr', type=int, help='enter number pages reviews')
 parser.add_argument('-place', type=str, required=True, help='enter with the city name')
+parser.add_argument('-pages', type=int, help='enter number pages')
 args = parser.parse_args()
 ahead_input = driver.find_element_by_class_name("typeahead_input").click()
 
@@ -104,7 +105,7 @@ def reviews():
                 records_to_insert = [(hotel_name, rating, review, hometown, date, triptype)]
                 cursor.executemany(insert_table, records_to_insert)
                 connection.commit()
-            print(cursor.rowcount, "Record in recensioni")
+            print(cursor.rowcount, "record in Reviews")
             go_on.click()
             time.sleep(5)            
         
@@ -147,7 +148,7 @@ def reviews():
                 records_to_insert = [(hotel_name, rating, review, hometown, date, triptype)]
                 cursor.executemany(insert_table, records_to_insert)
                 connection.commit()
-            print(cursor.rowcount, "Record in recensioni")
+            print(cursor.rowcount, "record in Reviews")
 
 
 #connection
@@ -189,6 +190,9 @@ try:
     time_page = wait.until(EC.element_to_be_clickable((By.XPATH, "//a[contains(@class, 'pageNum')]")))
     number_pages = driver.find_element_by_xpath("//a[contains(@class, 'pageNum')][position() = last()]").text
     pages = int(number_pages) #conversion
+
+    if args.pages:
+        pages = args.pages
 
     for j in range(0,pages): 
         homepage = driver.window_handles[0]  

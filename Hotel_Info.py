@@ -72,7 +72,7 @@ def info():
     records_to_insert = [(hotel_name, address, rating, review_count, popular_index)]
     cursor.executemany(insert_table, records_to_insert)
     connection.commit()
-    print(cursor.rowcount, "Record in Hotel_Info")
+    print(cursor.rowcount, "record in Info")
 
 #connection
 try:
