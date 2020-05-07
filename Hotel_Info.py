@@ -27,17 +27,20 @@ wait = WebDriverWait(driver, 15)
 
 
 
-
 config = configparser.ConfigParser()
 config_zars = config.read('config.ini')
 if not config_zars:
     exit('no config.ini')
 else:
-    host_zars = config["zarsDB"]["host"]
-    user_zars = config["zarsDB"]["user"]
+    host_zars = config['zarsDB']['host']
+    user_zars = config['zarsDB']['user']
+    time_zars = config['waiting time']['set_time']
+    
     #passwd_zars = config["zarsDB"]["passwd"]
     #db_zars = config['zarsDB']['db']
-if not host_zars or not user_zars:
+    seconds = int(time_zars)
+
+if not host_zars or not user_zars or not time_zars:
     exit('parametri file config.ini non definiti')
 
 
@@ -52,14 +55,14 @@ parser.add_argument('-pages', type=int, help='enter number pages')
 args = parser.parse_args()
 ahead_input = driver.find_element_by_class_name("typeahead_input").click()
 
-time.sleep(1)
+time.sleep(seconds)
 
 input_search = driver.find_element_by_class_name("typeahead_input")
 input_search.send_keys(args.place)
-time.sleep(4)
+time.sleep(seconds)
 research = driver.find_element_by_xpath("//button[@id='SUBMIT_HOTELS']").click()
 
-time.sleep(3)
+time.sleep(seconds)
 #driver.add_cookie({"name": "_uetsid", "value": "_uetd2a7c6e0-2416-ce9c-ead4-0042b8c47379", 'SameSite': 'None'})
 #driver.add_cookie({"name": "_uetsid", "value": "_uet12514d11-bea2-dcfd-4c62-445dbbd139e0", 'SameSite': 'None'})
 
@@ -71,7 +74,7 @@ element = driver.find_element_by_class_name("_1HphCM4i")
 driver.execute_script("arguments[0].style.position = 'initial';", element)
 
 
-time.sleep(3)
+time.sleep(seconds)
 
 
 
@@ -90,7 +93,7 @@ def info():
         rating = float_rating
         review_count = driver.find_element_by_xpath("//div[contains(@class, 'ratingContainer')]//span[contains(@class, 'reviewCount')]").text
         popular_index = driver.find_element_by_xpath("//div[contains(@class, 'popIndex')]").text
-        time.sleep(2)
+        time.sleep(seconds)
     except:
         address = ""
         rating = ""
@@ -137,7 +140,7 @@ try:
             print(error)
             exit(1)
     
-    cursor.execute("CREATE TABLE IF NOT EXISTS info (Name VARCHAR(64) NOT NULL, City VARCHAR(64), Address VARCHAR(512), Rating VARCHAR(4), Review_Count VARCHAR(64), Popular_Index VARCHAR(64))") 
+    cursor.execute("CREATE TABLE IF NOT EXISTS info (Name VARCHAR(64) NOT NULL, City VARCHAR(64) NOT NULL, Address VARCHAR(512), Rating VARCHAR(4), Review_Count VARCHAR(64), Popular_Index VARCHAR(64))") 
     
 
     #manage page
@@ -150,36 +153,37 @@ try:
 
     for j in range(0,pages): 
         homepage = driver.window_handles[0]  
-        #view_urls = wait.until(EC.element_to_be_clickable((By.XPATH, "//a[@data-clicksource='HotelName']")))
+        time.sleep(seconds)
+        view_urls = wait.until(EC.element_to_be_clickable((By.XPATH, "//a[@data-clicksource='HotelName']")))
         urls = driver.find_elements_by_xpath("//a[@data-clicksource='HotelName']") #url 
         driver.find_element_by_xpath("//div[@class='h1-container']").click()
-        time.sleep(2)
+        time.sleep(seconds)
         if j < (pages-1):
             go_on = driver.find_element_by_xpath("//a[contains(text(),'Avanti')]") #button
-            time.sleep(2)
+            time.sleep(seconds)
             for i in range(0,(len(urls))):
                 urls[i].click()
                 window_after = driver.window_handles[1]
                 driver.switch_to.window(window_after)
-                time.sleep(4)
+                time.sleep(seconds)
                 info() #call the function defined
-                time.sleep(4)
+                time.sleep(seconds)
                 driver.close()
                 driver.switch_to.window(homepage)
-                time.sleep(5)
+                time.sleep(seconds)
             go_on.click()
-            time.sleep(5)  
+            time.sleep(seconds)  
         else:
             for i in range(0,(len(urls))):
                 urls[i].click()
                 window_after = driver.window_handles[1]
                 driver.switch_to.window(window_after)
-                time.sleep(4)
+                time.sleep(seconds)
                 info() #call the function defined
-                time.sleep(4)
+                time.sleep(seconds)
                 driver.close()
                 driver.switch_to.window(homepage)
-                time.sleep(5)
+                time.sleep(seconds)
     driver.quit()
                 
             
