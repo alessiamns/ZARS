@@ -21,8 +21,6 @@ options = Options()
 options.add_argument('headless')
 options.add_argument('--lang=it')
 
-
-
 driver = webdriver.Chrome(options=options)
 wait = WebDriverWait(driver, 15)
 
@@ -62,8 +60,8 @@ time.sleep(4)
 research = driver.find_element_by_xpath("//button[@id='SUBMIT_HOTELS']").click()
 
 time.sleep(3)
-driver.add_cookie({"name": "_uetsid", "value": "_uetd2a7c6e0-2416-ce9c-ead4-0042b8c47379", 'SameSite': 'None'})
-driver.add_cookie({"name": "_uetsid", "value": "_uet12514d11-bea2-dcfd-4c62-445dbbd139e0", 'SameSite': 'None'})
+#driver.add_cookie({"name": "_uetsid", "value": "_uetd2a7c6e0-2416-ce9c-ead4-0042b8c47379", 'SameSite': 'None'})
+#driver.add_cookie({"name": "_uetsid", "value": "_uet12514d11-bea2-dcfd-4c62-445dbbd139e0", 'SameSite': 'None'})
 
 
 

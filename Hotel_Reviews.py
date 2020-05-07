@@ -6,22 +6,45 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.chrome.options import Options
+from http import cookies
 import time
 import re
+import configparser
 import mysql.connector
 from mysql.connector import Error
 from mysql.connector import errorcode
 import argparse
 import sys
 
-options = Options()
-options.add_experimental_option("prefs", {"profile.default_content_setting_values.cookies": 2})
+options = webdriver.ChromeOptions()
+#options.add_experimental_option("prefs", {"profile.default_content_setting_values.cookies": 2})
+options.add_argument('headless')
+options.add_argument('--lang=it')
+
 driver = webdriver.Chrome(options=options)
 wait = WebDriverWait(driver, 15)
+
+
+
+
+
+config = configparser.ConfigParser()
+config_zars = config.read('config.ini')
+if not config_zars:
+    exit('no config.ini')
+else:
+    host_zars = config["zarsDB"]["host"]
+    user_zars = config["zarsDB"]["user"]
+    #passwd_zars = config["zarsDB"]["passwd"]
+    #db_zars = config['zarsDB']['db']
+if not host_zars or not user_zars:
+    exit('parametri file config.ini non definiti')
+
 
 #get url
 driver.get("http://www.tripadvisor.it/Hotels")
 driver.maximize_window()
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-pr', type=int, help='enter number pages reviews')
@@ -55,7 +78,8 @@ def reviews():
     hotel_name = driver.find_element_by_xpath("//h1[contains(@class, 'hotel-review')]").text 
     go_review = driver.find_element_by_xpath("//span[contains(@class, 'reviewCount')]")
     go_review.click() #su per scendere giu alle recensioni
-    
+    city = str(args.place)
+
     time_page = wait.until(EC.element_to_be_clickable((By.XPATH, "//a[contains(@class, 'pageNum')]")))
     number_pages = driver.find_element_by_xpath("//a[contains(@class, 'pageNum')][position() = last()]").text
     pages_review = int(number_pages) #conversion
@@ -64,7 +88,7 @@ def reviews():
         pages_review = args.pr
     
     for j in range(0,pages_review): 
-        insert_table = "INSERT INTO reviews (Name, Rating, Review, Hometown, Date_of_stay, Trip_type) VALUES (%s, %s, %s, %s, %s, %s)"
+        insert_table = "INSERT INTO reviews (Name, City, Rating, Review, Hometown, Date_of_stay, Trip_type) VALUES (%s, %s, %s, %s, %s, %s, %s)"
         
         if j < (pages_review-1): 
             go_on = driver.find_element_by_xpath("//a[contains(text(),'Avanti')]") #button
@@ -102,7 +126,7 @@ def reviews():
                     date = ""
                     triptype = ""
                     
-                records_to_insert = [(hotel_name, rating, review, hometown, date, triptype)]
+                records_to_insert = [(hotel_name, city, rating, review, hometown, date, triptype)]
                 cursor.executemany(insert_table, records_to_insert)
                 connection.commit()
             print(cursor.rowcount, "record in Reviews")
@@ -145,26 +169,25 @@ def reviews():
                     triptype = ""
                 
                 
-                records_to_insert = [(hotel_name, rating, review, hometown, date, triptype)]
+                records_to_insert = [(hotel_name, city, rating, review, hometown, date, triptype)]
                 cursor.executemany(insert_table, records_to_insert)
                 connection.commit()
             print(cursor.rowcount, "record in Reviews")
 
+connection = mysql.connector.connect(
+        host=host_zars,
+        user=user_zars,
+        #passwd=passwd_zars,
+        #db = db_zars
+            )
+cursor = connection.cursor()
 
 #connection
-try:
-    
-    db = "ota"+ "_" + str(args.place)
-
-
-    connection = mysql.connector.connect(
-        host="localhost",
-        user="root",
-        passwd="",
-            )
-    cursor = connection.cursor()
+try:    
+    db = "zars"
 
     def create_db(cursor):
+        
         try:
             cursor.execute("CREATE DATABASE {} DEFAULT CHARACTER SET 'utf8'".format(db))
         except mysql.connector.Error as error:
@@ -182,9 +205,8 @@ try:
         else:
             print(error)
             exit(1)
-    
-    
-    cursor.execute("CREATE TABLE reviews (ID_hotel int(11), Name VARCHAR(64) NOT NULL, Rating int(2), Review VARCHAR(512), Hometown VARCHAR(64), Date_of_stay VARCHAR(64), Trip_type VARCHAR(64), Language VARCHAR(64)) ")
+        
+    cursor.execute("CREATE TABLE IF NOT EXISTS reviews (Name VARCHAR(64) NOT NULL, City VARCHAR(64), Rating int(2), Review VARCHAR(512), Hometown VARCHAR(64), Date_of_stay VARCHAR(64), Trip_type VARCHAR(64), Language VARCHAR(64)) ")
     
     #manage pages
     time_page = wait.until(EC.element_to_be_clickable((By.XPATH, "//a[contains(@class, 'pageNum')]")))
