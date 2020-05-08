@@ -17,7 +17,7 @@ import argparse
 import sys
 
 options = Options()
-#options.add_experimental_option("prefs", {"profile.default_content_setting_values.cookies": 2})
+options.add_experimental_option("prefs", {"profile.default_content_setting_values.cookies": 2})
 options.add_argument('headless')
 options.add_argument('--lang=it')
 

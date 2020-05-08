@@ -85,9 +85,14 @@ def reviews():
         go_review.click() #su per scendere giu alle recensioni
         city = str(args.place)
 
+        driver.find_element_by_xpath("//span[contains(text(),'Tutte le lingue')]").click()
+        time.sleep(seconds)
+
         time_page = wait.until(EC.element_to_be_clickable((By.XPATH, "//a[contains(@class, 'pageNum')]")))
         number_pages = driver.find_element_by_xpath("//a[contains(@class, 'pageNum')][position() = last()]").text
         pages_review = int(number_pages) #conversion
+
+        
 
         if args.pr:
             pages_review = args.pr
@@ -97,8 +102,8 @@ def reviews():
             
             if j < (pages_review-1): 
                 go_on = driver.find_element_by_xpath("//a[contains(text(),'Avanti')]") #button
-                language = driver.find_element_by_xpath("//span[contains(text(),'Italiano')]")
-                language.click() #language
+                #language = driver.find_element_by_xpath("//span[contains(text(),'Italiano')]")
+                #language.click() #language
                 view_plus = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[contains(@class,'Expandable')]//span[contains(text(),'Scopri di pi')]")))
                 info_plus = driver.find_element_by_xpath("//div[contains(@class,'Expandable')]//span[contains(text(),'Scopri di pi')]")
                 info_plus.click() 
@@ -214,7 +219,7 @@ try:
             print(error)
             exit(1)
         
-    cursor.execute("CREATE TABLE IF NOT EXISTS reviews (Name VARCHAR(64) NOT NULL, City VARCHAR(64) NOT NULL, Rating int(2), Review VARCHAR(512), Hometown VARCHAR(64), Date_of_stay VARCHAR(64), Trip_type VARCHAR(64), Language VARCHAR(64)) ")
+    cursor.execute("CREATE TABLE IF NOT EXISTS reviews (Name VARCHAR(64) NOT NULL, City VARCHAR(64) NOT NULL, Rating int(2), Review VARCHAR(512), Hometown VARCHAR(64), Date_of_stay VARCHAR(64), Trip_type VARCHAR(64)) ")
     
     #manage pages
     time_page = wait.until(EC.element_to_be_clickable((By.XPATH, "//a[contains(@class, 'pageNum')]")))
