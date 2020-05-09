@@ -53,37 +53,38 @@ calendar = driver.find_element_by_class_name("_1HphCM4i")
 driver.execute_script("arguments[0].style.position = 'initial';", calendar)
 time.sleep(seconds)
 
-#function info
-def info():
+def facilities():
+    insert_table = "INSERT INTO facilities (Name, City, Great_to_walkers, Restaurants_500m, Attractions_500m) VALUES (%s, %s,  %s, %s, %s)"
     hotel_name = driver.find_element_by_xpath("//h1[contains(@class, 'hotel-review')]").text
     city = str(args.place)
-    try:
-        address = driver.find_element_by_xpath("//div[contains(@class, 'ListingEntry')]//span[contains(@class, 'ContactInfo')][2]").text
-        #rating value
-        rating_value = driver.find_element_by_xpath("//div[contains(@class, 'ratingContainer')]//span[contains(@class, 'ui_bubble')]")
-        rating_class = rating_value.get_attribute("class")
-        value_rating = rating_class[-2:]
-        float_rating = value_rating[:1] + '.' + value_rating[1:]
-        rating = float_rating
-        review_count = driver.find_element_by_xpath("//div[contains(@class, 'ratingContainer')]//span[contains(@class, 'reviewCount')]").text
-        popular_index = driver.find_element_by_xpath("//div[contains(@class, 'popIndex')]").text
-        time.sleep(seconds)
-    except:
-        address = ""
-        rating = ""
-        review_count = ""
-        popular_index = ""
 
-    insert_table = "INSERT INTO info (Name, City, Address, Rating, Review_Count, Popular_Index) VALUES (%s, %s, %s, %s, %s, %s)"
-    records_to_insert = [(hotel_name, city, address, rating, review_count, popular_index)]
+    try:
+        t_walker = driver.find_element_by_xpath("//div[contains(@class, 'wrapper')][1]/span[1]").text #punteggio su 100
+        t_restaurant = driver.find_element_by_xpath("//div[contains(@class, 'wrapper')][2]/span[1]").text #ristoranti
+        t_attraction = driver.find_element_by_xpath("//div[contains(@class, 'wrapper')][3]/span[1]").text #attrazioni
+        walker = int(t_walker)
+        restaurant = int(t_restaurant)
+        attraction = int(t_attraction)
+        
+    except:
+        walker = None
+        restaurant = None
+        attraction = None
+
+    records_to_insert = [(hotel_name, city, walker, restaurant, attraction)]
     cursor.executemany(insert_table, records_to_insert)
+    
     connection.commit()
-    print(cursor.rowcount, "record in Info")
+    print(cursor.rowcount, "record in Facilities")
+
+
+
+
 
 connection = mysql.connector.connect(
         host=host_zars,
         user=user_zars
-            )
+        )
 cursor = connection.cursor()
 
 #connection
@@ -95,6 +96,7 @@ try:
         except mysql.connector.Error as error:
             print("Failed creating database: {}".format(error))
             exit(1)
+
     try:
         cursor.execute("USE {}".format(db))
     except mysql.connector.Error as error:
@@ -107,7 +109,8 @@ try:
             print(error)
             exit(1)
     
-    cursor.execute("CREATE TABLE IF NOT EXISTS info (Name VARCHAR(64) NOT NULL, City VARCHAR(64) NOT NULL, Address VARCHAR(512), Rating VARCHAR(4), Review_Count VARCHAR(64), Popular_Index VARCHAR(64), PRIMARY KEY(Name))") 
+    
+    cursor.execute("CREATE TABLE IF NOT EXISTS facilities (Name VARCHAR(64) NOT NULL, City VARCHAR(64) NOT NULL, Great_to_walkers INT(11), Restaurants_500m INT(11), Attractions_500m INT(11), PRIMARY KEY(Name)) ")    
     
     #manage page
     number_pages = driver.find_element_by_xpath("//a[contains(@class, 'pageNum')][position() = last()]").text
@@ -116,7 +119,7 @@ try:
     if args.pages:
         pages = args.pages
 
-    for j in range(0,pages): 
+    for j in range(0,pages):
         homepage = driver.window_handles[0]  
         time.sleep(seconds)
         urls = driver.find_elements_by_xpath("//a[@data-clicksource='HotelName']") #url 
@@ -135,7 +138,7 @@ try:
                     window_after = driver.window_handles[1]
                     driver.switch_to.window(window_after)
                     time.sleep(seconds)
-                    info() #call the function defined
+                    facilities() #call the function defined
                     time.sleep(seconds)
                     driver.close()
                     driver.switch_to.window(homepage)
@@ -145,7 +148,7 @@ try:
                     window_after = driver.window_handles[1]
                     driver.switch_to.window(window_after)
                     time.sleep(seconds)
-                    info() #call the function defined
+                    facilities() #call the function defined
                     time.sleep(seconds)
                     driver.close()
                     driver.switch_to.window(homepage)
@@ -163,7 +166,7 @@ try:
                     window_after = driver.window_handles[1]
                     driver.switch_to.window(window_after)
                     time.sleep(seconds)
-                    info() #call the function defined
+                    facilities() #call the function defined
                     time.sleep(seconds)
                     driver.close()
                     driver.switch_to.window(homepage)
@@ -173,13 +176,13 @@ try:
                     window_after = driver.window_handles[1]
                     driver.switch_to.window(window_after)
                     time.sleep(seconds)
-                    info() #call the function defined
+                    facilities() #call the function defined
                     time.sleep(seconds)
                     driver.close()
                     driver.switch_to.window(homepage)
                     time.sleep(seconds)
-    driver.quit()
-                
+    driver.quit()            
+    
 except mysql.connector.Error as error:
     print("Failed to insert record into MySQL table {}".format(error))
 
@@ -188,7 +191,3 @@ finally:
         cursor.close()
         connection.close()
         print("MySQL connection is closed")
-
-
-
-

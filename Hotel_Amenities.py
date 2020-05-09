@@ -112,7 +112,7 @@ try:
             exit(1)
     
     
-    cursor.execute("CREATE TABLE IF NOT EXISTS amenities (Name VARCHAR(64) NOT NULL, City VARCHAR(64) NOT NULL, Amenity VARCHAR(64) NOT NULL) ")    
+    cursor.execute("CREATE TABLE IF NOT EXISTS amenities (Name VARCHAR(64) NOT NULL, City VARCHAR(64) NOT NULL, Amenity VARCHAR(64) NOT NULL, PRIMARY KEY(Name, Amenity)) ")    
     
     #manage page
     number_pages = driver.find_element_by_xpath("//a[contains(@class, 'pageNum')][position() = last()]").text

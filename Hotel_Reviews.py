@@ -168,7 +168,7 @@ try:
             print(error)
             exit(1)
         
-    cursor.execute("CREATE TABLE IF NOT EXISTS reviews (Name VARCHAR(64) NOT NULL, City VARCHAR(64) NOT NULL, Rating int(2), Review VARCHAR(1024), Hometown VARCHAR(64), Date_of_stay VARCHAR(64), Trip_type VARCHAR(64)) ")
+    cursor.execute("CREATE TABLE IF NOT EXISTS reviews (Name VARCHAR(64) NOT NULL, City VARCHAR(64) NOT NULL, Rating int(2), Review VARCHAR(1024), Hometown VARCHAR(64), Date_of_stay VARCHAR(64), Trip_type VARCHAR(64), PRIMARY KEY(Name)) ")
     
     #manage pages
     number_pages = driver.find_element_by_xpath("//a[contains(@class, 'pageNum')][position() = last()]").text
