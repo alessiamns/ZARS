@@ -12,6 +12,9 @@ from mysql.connector import errorcode
 import argparse
 import sys
 
+start = time.time()
+
+
 options = Options()
 options.add_experimental_option("prefs", {"profile.default_content_setting_values.cookies": 2})
 options.add_argument('headless')
@@ -177,7 +180,7 @@ try:
                     time.sleep(seconds)
                     driver.close()
                     driver.switch_to.window(homepage)
-                    time.sleep(seconds)
+                    time.sleep(seconds)              
     driver.quit()
                 
 except mysql.connector.Error as error:
@@ -190,5 +193,7 @@ finally:
         print("MySQL connection is closed")
 
 
-
+end = time.time()
+#test time
+print(end - start)
 
