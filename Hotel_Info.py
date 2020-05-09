@@ -1,12 +1,8 @@
 import selenium
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.chrome.options import Options
-from http import cookies
 import time
 import re
 import configparser
@@ -22,10 +18,6 @@ options.add_argument('headless')
 options.add_argument('--lang=it')
 
 driver = webdriver.Chrome(options=options)
-wait = WebDriverWait(driver, 15)
-
-
-
 
 config = configparser.ConfigParser()
 config_zars = config.read('config.ini')
@@ -35,49 +27,31 @@ else:
     host_zars = config['zarsDB']['host']
     user_zars = config['zarsDB']['user']
     time_zars = config['waiting time']['set_time']
-    
-    #passwd_zars = config["zarsDB"]["passwd"]
-    #db_zars = config['zarsDB']['db']
     seconds = int(time_zars)
 
 if not host_zars or not user_zars or not time_zars:
     exit('parametri file config.ini non definiti')
 
-
 #get url
 driver.get("http://www.tripadvisor.it/Hotels")
 driver.maximize_window()
-
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-place', type=str, required=True, help='enter with the city name')
 parser.add_argument('-pages', type=int, help='enter number pages')
 args = parser.parse_args()
 ahead_input = driver.find_element_by_class_name("typeahead_input").click()
-
 time.sleep(seconds)
-
 input_search = driver.find_element_by_class_name("typeahead_input")
 input_search.send_keys(args.place)
 time.sleep(seconds)
 research = driver.find_element_by_xpath("//button[@id='SUBMIT_HOTELS']").click()
-
 time.sleep(seconds)
-#driver.add_cookie({"name": "_uetsid", "value": "_uetd2a7c6e0-2416-ce9c-ead4-0042b8c47379", 'SameSite': 'None'})
-#driver.add_cookie({"name": "_uetsid", "value": "_uet12514d11-bea2-dcfd-4c62-445dbbd139e0", 'SameSite': 'None'})
-
-
 
 #close calendar
-view_calendar = wait.until(EC.element_to_be_clickable((By.CLASS_NAME, "_1HphCM4i")))
-element = driver.find_element_by_class_name("_1HphCM4i")
-driver.execute_script("arguments[0].style.position = 'initial';", element)
-
-
+calendar = driver.find_element_by_class_name("_1HphCM4i")
+driver.execute_script("arguments[0].style.position = 'initial';", calendar)
 time.sleep(seconds)
-
-
-
 
 #function info
 def info():
@@ -106,28 +80,21 @@ def info():
     connection.commit()
     print(cursor.rowcount, "record in Info")
 
-
-
 connection = mysql.connector.connect(
         host=host_zars,
-        user=user_zars,
-        #passwd=passwd_zars,
-        #db = db_zars
+        user=user_zars
             )
 cursor = connection.cursor()
 
 #connection
 try:    
     db = "zars"
-
     def create_db(cursor):
-        
         try:
             cursor.execute("CREATE DATABASE {} DEFAULT CHARACTER SET 'utf8'".format(db))
         except mysql.connector.Error as error:
             print("Failed creating database: {}".format(error))
             exit(1)
-
     try:
         cursor.execute("USE {}".format(db))
     except mysql.connector.Error as error:
@@ -142,9 +109,7 @@ try:
     
     cursor.execute("CREATE TABLE IF NOT EXISTS info (Name VARCHAR(64) NOT NULL, City VARCHAR(64) NOT NULL, Address VARCHAR(512), Rating VARCHAR(4), Review_Count VARCHAR(64), Popular_Index VARCHAR(64))") 
     
-
     #manage page
-    time_page = wait.until(EC.element_to_be_clickable((By.XPATH, "//a[contains(@class, 'pageNum')]")))
     number_pages = driver.find_element_by_xpath("//a[contains(@class, 'pageNum')][position() = last()]").text
     pages = int(number_pages)  #conversion
 
@@ -154,7 +119,6 @@ try:
     for j in range(0,pages): 
         homepage = driver.window_handles[0]  
         time.sleep(seconds)
-        view_urls = wait.until(EC.element_to_be_clickable((By.XPATH, "//a[@data-clicksource='HotelName']")))
         urls = driver.find_elements_by_xpath("//a[@data-clicksource='HotelName']") #url 
         driver.find_element_by_xpath("//div[@class='h1-container']").click()
         time.sleep(seconds)
@@ -162,37 +126,60 @@ try:
             go_on = driver.find_element_by_xpath("//a[contains(text(),'Avanti')]") #button
             time.sleep(seconds)
             for i in range(0,(len(urls))):
-                urls[i].click()
-                window_after = driver.window_handles[1]
-                driver.switch_to.window(window_after)
-                time.sleep(seconds)
-                info() #call the function defined
-                time.sleep(seconds)
-                driver.close()
-                driver.switch_to.window(homepage)
-                time.sleep(seconds)
+                try:
+                    ads = driver.find_element_by_tag_name("iframe")
+                    driver.switch_to.frame(ads)
+                    time.sleep(seconds)
+                    driver.switch_to.default_content()
+                    urls[i].click()
+                    window_after = driver.window_handles[1]
+                    driver.switch_to.window(window_after)
+                    time.sleep(seconds)
+                    info() #call the function defined
+                    time.sleep(seconds)
+                    driver.close()
+                    driver.switch_to.window(homepage)
+                    time.sleep(seconds)
+                except:
+                    urls[i].click()
+                    window_after = driver.window_handles[1]
+                    driver.switch_to.window(window_after)
+                    time.sleep(seconds)
+                    info() #call the function defined
+                    time.sleep(seconds)
+                    driver.close()
+                    driver.switch_to.window(homepage)
+                    time.sleep(seconds)
             go_on.click()
             time.sleep(seconds)  
         else:
             for i in range(0,(len(urls))):
-                urls[i].click()
-                window_after = driver.window_handles[1]
-                driver.switch_to.window(window_after)
-                time.sleep(seconds)
-                info() #call the function defined
-                time.sleep(seconds)
-                driver.close()
-                driver.switch_to.window(homepage)
-                time.sleep(seconds)
+                try:
+                    ads = driver.find_element_by_tag_name("iframe")
+                    driver.switch_to.frame(ads)
+                    time.sleep(seconds)
+                    driver.switch_to.default_content()
+                    urls[i].click()
+                    window_after = driver.window_handles[1]
+                    driver.switch_to.window(window_after)
+                    time.sleep(seconds)
+                    info() #call the function defined
+                    time.sleep(seconds)
+                    driver.close()
+                    driver.switch_to.window(homepage)
+                    time.sleep(seconds)
+                except:
+                    urls[i].click()
+                    window_after = driver.window_handles[1]
+                    driver.switch_to.window(window_after)
+                    time.sleep(seconds)
+                    info() #call the function defined
+                    time.sleep(seconds)
+                    driver.close()
+                    driver.switch_to.window(homepage)
+                    time.sleep(seconds)
     driver.quit()
                 
-            
-    
-    
-    
-            
-        
-    
 except mysql.connector.Error as error:
     print("Failed to insert record into MySQL table {}".format(error))
 
@@ -201,13 +188,6 @@ finally:
         cursor.close()
         connection.close()
         print("MySQL connection is closed")
-
-
-
-
-#window_before = driver.window_handles[0]
-#driver.switch_to.window(window_before)
-
 
 
 
