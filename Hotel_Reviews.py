@@ -12,6 +12,8 @@ from mysql.connector import errorcode
 import argparse
 import sys
 
+start = time.time()
+
 options = webdriver.ChromeOptions()
 options.add_experimental_option("prefs", {"profile.default_content_setting_values.cookies": 2})
 options.add_argument('headless')
@@ -168,7 +170,7 @@ try:
             print(error)
             exit(1)
         
-    cursor.execute("CREATE TABLE IF NOT EXISTS reviews (Name VARCHAR(64) NOT NULL, City VARCHAR(64) NOT NULL, Rating int(2), Review VARCHAR(1024), Hometown VARCHAR(64), Date_of_stay VARCHAR(64), Trip_type VARCHAR(64), PRIMARY KEY(Name)) ")
+    cursor.execute("CREATE TABLE IF NOT EXISTS reviews (Name VARCHAR(64) NOT NULL, City VARCHAR(64) NOT NULL, Rating int(2), Review VARCHAR(1024), Hometown VARCHAR(64), Date_of_stay VARCHAR(64), Trip_type VARCHAR(64), FOREIGN KEY(Name) REFERENCES info(Name)) ")
     
     #manage pages
     number_pages = driver.find_element_by_xpath("//a[contains(@class, 'pageNum')][position() = last()]").text
@@ -251,4 +253,6 @@ finally:
         print("MySQL connection is closed")
 
 
-
+end = time.time()
+#test time
+print(end - start)

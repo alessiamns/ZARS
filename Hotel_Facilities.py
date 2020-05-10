@@ -12,6 +12,8 @@ from mysql.connector import errorcode
 import argparse
 import sys
 
+start = time.time()
+
 options = Options()
 options.add_experimental_option("prefs", {"profile.default_content_setting_values.cookies": 2})
 options.add_argument('headless')
@@ -110,7 +112,7 @@ try:
             exit(1)
     
     
-    cursor.execute("CREATE TABLE IF NOT EXISTS facilities (Name VARCHAR(64) NOT NULL, City VARCHAR(64) NOT NULL, Great_to_walkers INT(11), Restaurants_500m INT(11), Attractions_500m INT(11), PRIMARY KEY(Name)) ")    
+    cursor.execute("CREATE TABLE IF NOT EXISTS facilities (Name VARCHAR(64) NOT NULL, City VARCHAR(64) NOT NULL, Great_to_walkers INT(11), Restaurants_500m INT(11), Attractions_500m INT(11)) ")    
     
     #manage page
     number_pages = driver.find_element_by_xpath("//a[contains(@class, 'pageNum')][position() = last()]").text
@@ -191,3 +193,7 @@ finally:
         cursor.close()
         connection.close()
         print("MySQL connection is closed")
+
+end = time.time()
+#test time
+print(end - start)
