@@ -58,27 +58,33 @@ time.sleep(seconds)
 
 #function info
 def info():
+    insert_table = "INSERT INTO info (Name, City, Address, Url, Rating, Review_Count, Popular_Index) VALUES (%s, %s, %s, %s, %s, %s, %s)"
     hotel_name = driver.find_element_by_xpath("//h1[contains(@class, 'hotel-review')]").text
     city = str(args.place)
     try:
         address = driver.find_element_by_xpath("//div[contains(@class, 'ListingEntry')]//span[contains(@class, 'ContactInfo')][2]").text
-        #rating value
+    except:
+        address = ""
+    try:
         rating_value = driver.find_element_by_xpath("//div[contains(@class, 'ratingContainer')]//span[contains(@class, 'ui_bubble')]")
         rating_class = rating_value.get_attribute("class")
         value_rating = rating_class[-2:]
         float_rating = value_rating[:1] + '.' + value_rating[1:]
-        rating = float_rating
-        review_count = driver.find_element_by_xpath("//div[contains(@class, 'ratingContainer')]//span[contains(@class, 'reviewCount')]").text
-        popular_index = driver.find_element_by_xpath("//div[contains(@class, 'popIndex')]").text
-        time.sleep(seconds)
+        rating = float(float_rating)
     except:
-        address = ""
-        rating = ""
+        rating = None
+    try:
+        review_count = driver.find_element_by_xpath("//div[contains(@class, 'ratingContainer')]//span[contains(@class, 'reviewCount')]").text
+    except:      
         review_count = ""
+    try:
+        popular_index = driver.find_element_by_xpath("//div[contains(@class, 'popIndex')]").text
+    except:
         popular_index = ""
 
-    insert_table = "INSERT INTO info (Name, City, Address, Rating, Review_Count, Popular_Index) VALUES (%s, %s, %s, %s, %s, %s)"
-    records_to_insert = [(hotel_name, city, address, rating, review_count, popular_index)]
+    time.sleep(seconds)
+
+    records_to_insert = [(hotel_name, city, address, text_url, rating, review_count, popular_index)]
     cursor.executemany(insert_table, records_to_insert)
     connection.commit()
     print(cursor.rowcount, "record in Info")
@@ -110,7 +116,7 @@ try:
             print(error)
             exit(1)
     
-    cursor.execute("CREATE TABLE IF NOT EXISTS info (Name VARCHAR(64) NOT NULL, City VARCHAR(64) NOT NULL, Address VARCHAR(512), Rating VARCHAR(4), Review_Count VARCHAR(64), Popular_Index VARCHAR(64), PRIMARY KEY(Name))") 
+    cursor.execute("CREATE TABLE IF NOT EXISTS info (Name VARCHAR(64) NOT NULL, City VARCHAR(64) NOT NULL, Address VARCHAR(512), Url VARCHAR(512), Rating FLOAT(2,1), Review_Count VARCHAR(64), Popular_Index VARCHAR(64), PRIMARY KEY(Name, City))") 
     
     #manage page
     number_pages = driver.find_element_by_xpath("//a[contains(@class, 'pageNum')][position() = last()]").text
@@ -134,7 +140,9 @@ try:
                     driver.switch_to.frame(ads)
                     time.sleep(seconds)
                     driver.switch_to.default_content()
-                    urls[i].click()
+                    hotel_url = urls[i]
+                    text_url = hotel_url.get_attribute("href")
+                    hotel_url.click()
                     window_after = driver.window_handles[1]
                     driver.switch_to.window(window_after)
                     time.sleep(seconds)
@@ -144,7 +152,9 @@ try:
                     driver.switch_to.window(homepage)
                     time.sleep(seconds)
                 except:
-                    urls[i].click()
+                    hotel_url = urls[i]
+                    text_url = hotel_url.get_attribute("href")
+                    hotel_url.click()
                     window_after = driver.window_handles[1]
                     driver.switch_to.window(window_after)
                     time.sleep(seconds)
@@ -162,7 +172,9 @@ try:
                     driver.switch_to.frame(ads)
                     time.sleep(seconds)
                     driver.switch_to.default_content()
-                    urls[i].click()
+                    hotel_url = urls[i]
+                    text_url = hotel_url.get_attribute("href")
+                    hotel_url.click()
                     window_after = driver.window_handles[1]
                     driver.switch_to.window(window_after)
                     time.sleep(seconds)
@@ -172,7 +184,9 @@ try:
                     driver.switch_to.window(homepage)
                     time.sleep(seconds)
                 except:
-                    urls[i].click()
+                    hotel_url = urls[i]
+                    text_url = hotel_url.get_attribute("href")
+                    hotel_url.click()
                     window_after = driver.window_handles[1]
                     driver.switch_to.window(window_after)
                     time.sleep(seconds)

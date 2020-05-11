@@ -62,15 +62,18 @@ def facilities():
 
     try:
         t_walker = driver.find_element_by_xpath("//div[contains(@class, 'wrapper')][1]/span[1]").text #punteggio su 100
-        t_restaurant = driver.find_element_by_xpath("//div[contains(@class, 'wrapper')][2]/span[1]").text #ristoranti
-        t_attraction = driver.find_element_by_xpath("//div[contains(@class, 'wrapper')][3]/span[1]").text #attrazioni
         walker = int(t_walker)
-        restaurant = int(t_restaurant)
-        attraction = int(t_attraction)
-        
     except:
         walker = None
+    try:
+        t_restaurant = driver.find_element_by_xpath("//div[contains(@class, 'wrapper')][2]/span[1]").text #ristoranti
+        restaurant = int(t_restaurant)
+    except:
         restaurant = None
+    try:
+        t_attraction = driver.find_element_by_xpath("//div[contains(@class, 'wrapper')][3]/span[1]").text #attrazioni
+        attraction = int(t_attraction)
+    except:
         attraction = None
 
     records_to_insert = [(hotel_name, city, walker, restaurant, attraction)]
@@ -183,6 +186,7 @@ try:
                     driver.close()
                     driver.switch_to.window(homepage)
                     time.sleep(seconds)
+    cursor.execute("ALTER TABLE facilities ADD FOREIGN KEY(Name, City) REFERENCES info(Name, City)")
     driver.quit()            
     
 except mysql.connector.Error as error:

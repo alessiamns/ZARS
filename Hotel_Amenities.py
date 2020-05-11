@@ -60,7 +60,8 @@ def amenities():
     hotel_name = driver.find_element_by_xpath("//h1[contains(@class, 'hotel-review')]").text
     city = str(args.place)
     try:
-        plus = driver.find_element_by_xpath("//div[@class='ssr-init-26f']/*[2]/following-sibling::*[1]")
+        plus = driver.find_element_by_xpath("//div[@class='ssr-init-26f']/*[2]/following-sibling::*[1]/div")
+        time.sleep(seconds)
         plus.click()
         #gestione servizi in una finestra
         active_amenities = driver.find_elements_by_xpath("//div[contains(@class, 'activeGroup')]//div[contains(@class,'amenity--3fbBj')]")
@@ -185,6 +186,7 @@ try:
                     driver.close()
                     driver.switch_to.window(homepage)
                     time.sleep(seconds)
+    cursor.execute("ALTER TABLE amenities ADD FOREIGN KEY(Name, City) REFERENCES info(Name, City)")
     driver.quit()            
     
 except mysql.connector.Error as error:
@@ -200,5 +202,3 @@ finally:
 end = time.time()
 #test time
 print(end - start)
-
-

@@ -72,7 +72,6 @@ def reviews():
             pages_review = args.pr
         
         for j in range(0,pages_review): 
-            insert_table = "INSERT INTO reviews (Name, City, Rating, Review, Hometown, Date_of_stay, Trip_type) VALUES (%s, %s, %s, %s, %s, %s, %s)"
             if j < (pages_review-1): 
                 go_on = driver.find_element_by_xpath("//a[contains(text(),'Avanti')]") #button
                 info_plus = driver.find_element_by_xpath("//div[contains(@class,'Expandable')]//span[contains(text(),'Scopri di pi')]")
@@ -80,28 +79,41 @@ def reviews():
                 time.sleep(seconds)
                 all_reviews = driver.find_elements_by_xpath("//q[contains(@class, 'location-review')]") 
                 for i in range(0,(len(all_reviews))): #loop reviews
+                    insert_table = "INSERT INTO reviews (Name, City, Rating, Review, Hometown, Date_of_stay, Trip_type) VALUES (%s, %s, %s, %s, %s, %s, %s)"
                     review = all_reviews[i].text
                     ix = str(i+1) #index
-                    rating_value = driver.find_element_by_xpath("//div[contains(@class, 'RatingLine')]//span[contains(@class, 'ui_bubble')]")
-                    rating_class = rating_value.get_attribute("class")
-                    length_class = len(rating_class)
-                    value_rating_len = rating_class[length_class-2]
-                    rating = int(value_rating_len) #rating (1 a 5)
+                    time.sleep(seconds)
                     try:
-                        time.sleep(seconds)
+                        rating_value = driver.find_element_by_xpath("//div[contains(@class,'hotels-community')][" + ix + "]//div[contains(@class, 'RatingLine')]//span[contains(@class, 'ui_bubble')]")
+                        rating_class = rating_value.get_attribute("class")
+                        length_class = len(rating_class)
+                        value_rating_len = rating_class[length_class-2]
+                        rating = int(value_rating_len) #rating (1 a 5)
+                    except:
+                        rating = ''
+                    
+                    try:
                         hometown_element = driver.find_element_by_xpath("//div[contains(@class,'hotels-community')][" + ix + "]//span[contains(@class,'hometown-')]") #hometown
-                        date_element = driver.find_element_by_xpath("//div[contains(@class,'hotels-community')][" + ix + "]//span[contains(@class, 'event_date')]") #date
-                        triptype_element = driver.find_element_by_xpath("//div[contains(@class,'hotels-community')]["+ ix + "]//span[contains(@class, 'TripType')]") #type
                         hometown = hometown_element.text
+                    except:
+                        hometown = ''
+                    
+                    try:
+                        date_element = driver.find_element_by_xpath("//div[contains(@class,'hotels-community')][" + ix + "]//span[contains(@class, 'event_date')]") #date
                         date_bef = date_element.text
                         date = date_bef.replace('Data del soggiorno:', '')
+                    except: 
+                        date = ''
+                    
+                    try:
+                        triptype_element = driver.find_element_by_xpath("//div[contains(@class,'hotels-community')]["+ ix + "]//span[contains(@class, 'TripType')]") #type
                         triptype_bef = triptype_element.text
                         triptype = triptype_bef.replace('Tipo di viaggio:', '')
                     except:
-                        hometown = ""
-                        date = ""
-                        triptype = ""
-                        
+                        triptype = ''
+                    
+                    
+                
                     records_to_insert = [(hotel_name, city, rating, review, hometown, date, triptype)]
                     cursor.executemany(insert_table, records_to_insert)
                     connection.commit()
@@ -114,27 +126,41 @@ def reviews():
                 time.sleep(seconds)
                 all_reviews = driver.find_elements_by_xpath("//q[contains(@class, 'location-review')]")
                 for i in range(0,(len(all_reviews))):
-                    review = all_reviews[i].text 
+                    insert_table = "INSERT INTO reviews (Name, City, Rating, Review, Hometown, Date_of_stay, Trip_type) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+                    review = all_reviews[i].text
                     ix = str(i+1) #index
-                    rating_value = driver.find_element_by_xpath("//div[contains(@class, 'RatingLine')]//span[contains(@class, 'ui_bubble')]")
-                    rating_class = rating_value.get_attribute("class")
-                    length_class = len(rating_class)
-                    value_rating_len = rating_class[length_class-2]
-                    rating = int(value_rating_len) #rating (da 1 a 5)
+                    time.sleep(seconds)
+                    
                     try:
-                        time.sleep(seconds)
-                        hometown_element = driver.find_element_by_xpath("//div[contains(@class,'hotels-community')][" + ix + "]//span[contains(@class,'hometown-')]")
-                        date_element = driver.find_element_by_xpath("//div[contains(@class,'hotels-community')][" + ix + "]//span[contains(@class, 'event_date')]")
-                        triptype_element = driver.find_element_by_xpath("//div[contains(@class,'hotels-community')]["+ ix + "]//span[contains(@class, 'TripType')]")
+                        rating_value = driver.find_element_by_xpath("//div[contains(@class,'hotels-community')][" + ix + "]//div[contains(@class, 'RatingLine')]//span[contains(@class, 'ui_bubble')]")
+                        rating_class = rating_value.get_attribute("class")
+                        length_class = len(rating_class)
+                        value_rating_len = rating_class[length_class-2]
+                        rating = int(value_rating_len) #rating (1 a 5)
+                    except:
+                        rating = ''
+                    
+                    try:
+                        hometown_element = driver.find_element_by_xpath("//div[contains(@class,'hotels-community')][" + ix + "]//span[contains(@class,'hometown-')]") #hometown
                         hometown = hometown_element.text
+                    except:
+                        hometown = ''
+                    
+                    try:
+                        date_element = driver.find_element_by_xpath("//div[contains(@class,'hotels-community')][" + ix + "]//span[contains(@class, 'event_date')]") #date
                         date_bef = date_element.text
                         date = date_bef.replace('Data del soggiorno:', '')
+                    except: 
+                        date = ''
+                    
+                    try:
+                        triptype_element = driver.find_element_by_xpath("//div[contains(@class,'hotels-community')]["+ ix + "]//span[contains(@class, 'TripType')]") #type
                         triptype_bef = triptype_element.text
                         triptype = triptype_bef.replace('Tipo di viaggio:', '')
                     except:
-                        hometown = ""
-                        date = ""
-                        triptype = ""
+                        triptype = ''
+                        
+                        
                     
                     records_to_insert = [(hotel_name, city, rating, review, hometown, date, triptype)]
                     cursor.executemany(insert_table, records_to_insert)
@@ -170,7 +196,7 @@ try:
             print(error)
             exit(1)
         
-    cursor.execute("CREATE TABLE IF NOT EXISTS reviews (Name VARCHAR(64) NOT NULL, City VARCHAR(64) NOT NULL, Rating int(2), Review VARCHAR(1024), Hometown VARCHAR(64), Date_of_stay VARCHAR(64), Trip_type VARCHAR(64), FOREIGN KEY(Name) REFERENCES info(Name)) ")
+    cursor.execute("CREATE TABLE IF NOT EXISTS reviews (Name VARCHAR(64) NOT NULL, City VARCHAR(64) NOT NULL, Rating int(2), Review VARCHAR(2048), Hometown VARCHAR(64), Date_of_stay VARCHAR(64), Trip_type VARCHAR(64), FOREIGN KEY(Name, City) REFERENCES info(Name, City)) ")
     
     #manage pages
     number_pages = driver.find_element_by_xpath("//a[contains(@class, 'pageNum')][position() = last()]").text
