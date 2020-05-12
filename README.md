@@ -29,17 +29,30 @@ python Hotel_Info.py -place Noto -pages 2
 > -pages `[OPTIONAL]`
 
 ### [Hotel_Facilities.py](Hotel_Facilities.py)
-
 ```
 python Hotel_Facilities.py -place Noto -pages 2
 ```
-### [Hotel_Amenities.py](Hotel_Amenities.py)
+#### Arguments
+> -place `[REQUIRED]`
 
+> -pages `[OPTIONAL]`
+
+### [Hotel_Amenities.py](Hotel_Amenities.py)
 ```
 python Hotel_Amenities.py -place Noto -pages 2
 ```
-### [Hotel_Reviews.py](Hotel_Reviews.py)
+#### Arguments
+> -place `[REQUIRED]`
 
+> -pages `[OPTIONAL]`
+
+### [Hotel_Reviews.py](Hotel_Reviews.py)
 ```
 python Hotel_Reviews.py -place Noto -pages 2 -pr 2
 ```
+#### Arguments
+> -place `[REQUIRED]`
+
+> -pages `[OPTIONAL]`
+
+> -pr `[OPTIONAL]`
