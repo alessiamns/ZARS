@@ -20,22 +20,26 @@ ricettive di una data città da un portale turistico cosiddetto OTA (Online Trav
 Download [Zars-master](https://github.com/alessiamns/ZARS.git)
 
 ## Running the tests
-#### Example [Hotel_Info.py](Hotel_Info.py)
-
+### [Hotel_Info.py](Hotel_Info.py): example
 ```
 python Hotel_Info.py -place Noto -pages 2
 ```
-#### Example [Hotel_Facilities.py](Hotel_Facilities.py)
+#### Arguments
+> -place `[REQUIRED]`
+
+> -pages `[OPTIONAL]`
+
+### [Hotel_Facilities.py](Hotel_Facilities.py)
 
 ```
 python Hotel_Facilities.py -place Noto -pages 2
 ```
-#### Example [Hotel_Amenities.py](Hotel_Amenities.py)
+### [Hotel_Amenities.py](Hotel_Amenities.py)
 
 ```
 python Hotel_Amenities.py -place Noto -pages 2
 ```
-#### Example [Hotel_Reviews.py](Hotel_Reviews.py)
+### [Hotel_Reviews.py](Hotel_Reviews.py)
 
 ```
 python Hotel_Reviews.py -place Noto -pages 2 -pr 2
