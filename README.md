@@ -1,6 +1,5 @@
 # ZARS
-Software per l’estrazione di informazioni relative alle strutture 
-ricettive di una data città da un portale turistico cosiddetto OTA (Online Travel Agencies). 
+Software per l’estrazione di informazioni relative alle strutture ricettive di una data città da un portale turistico.
 
 ## Getting Started
 ### Prerequisites
