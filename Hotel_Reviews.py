@@ -196,7 +196,7 @@ try:
             print(error)
             exit(1)
         
-    cursor.execute("CREATE TABLE IF NOT EXISTS reviews (Name VARCHAR(64) NOT NULL, City VARCHAR(64) NOT NULL, Rating int(2), Review VARCHAR(2048), Hometown VARCHAR(64), Date_of_stay VARCHAR(64), Trip_type VARCHAR(64), FOREIGN KEY(Name, City) REFERENCES info(Name, City)) ")
+    cursor.execute("CREATE TABLE IF NOT EXISTS reviews (Name VARCHAR(64) NOT NULL, City VARCHAR(64) NOT NULL, Rating int(2), Review VARCHAR(2048), Hometown VARCHAR(64), Date_of_stay VARCHAR(64), Trip_type VARCHAR(64)) ")
     
     #manage pages
     number_pages = driver.find_element_by_xpath("//a[contains(@class, 'pageNum')][position() = last()]").text
@@ -267,6 +267,9 @@ try:
                     driver.close()
                     driver.switch_to.window(homepage)
                     time.sleep(seconds)
+    cursor.execute("SET foreign_key_checks = 0")
+    cursor.execute("ALTER TABLE reviews ADD FOREIGN KEY(Name, City) REFERENCES info(Name, City)")
+    cursor.execute("SET foreign_key_checks = 1")
     driver.quit()
     
 except mysql.connector.Error as error:

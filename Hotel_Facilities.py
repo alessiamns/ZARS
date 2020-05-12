@@ -186,7 +186,9 @@ try:
                     driver.close()
                     driver.switch_to.window(homepage)
                     time.sleep(seconds)
+    cursor.execute("SET foreign_key_checks = 0")
     cursor.execute("ALTER TABLE facilities ADD FOREIGN KEY(Name, City) REFERENCES info(Name, City)")
+    cursor.execute("SET foreign_key_checks = 1")
     driver.quit()            
     
 except mysql.connector.Error as error:
