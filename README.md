@@ -1,6 +1,7 @@
 # ZARS
 Software per l’estrazione di informazioni relative alle strutture ricettive di una data città da un portale turistico.
 
+
 ## Getting Started
 ### Prerequisites
 - [Python 3](https://www.python.org/downloads/)
@@ -56,3 +57,6 @@ python Hotel_Reviews.py -place Noto -pages 2 -pr 2
 > -pages `[OPTIONAL]`
 
 > -pr `[OPTIONAL]`
+
+## Complete documentation
+- [Report - Istituto di Informatica e Telematica (CNR)] (https://www.iit.cnr.it/node/58830)
