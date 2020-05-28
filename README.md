@@ -1,5 +1,5 @@
 # ZARS
-Software per l’estrazione di informazioni relative alle strutture ricettive di una data città da un portale turistico.
+Zars is a software completely written in Python for the extraction of information relating to the accommodation facilities of a given city, passed as an argument, from a tourist portal called OTA (Online Travel agencies). With regard to each accommodation facility, Zars allows you to extract its description, services and associated reviews. The results obtained are returned in the form of a SQL database. Zars is released under the GNU General Public License v 3.0. 
 
 
 ## Getting Started
@@ -26,7 +26,6 @@ python Hotel_Info.py -place Noto -pages 2
 ```
 #### Arguments
 > -place `[REQUIRED]`
-
 > -pages `[OPTIONAL]`
 
 ### [Hotel_Facilities.py](Hotel_Facilities.py)
@@ -35,7 +34,6 @@ python Hotel_Facilities.py -place Noto -pages 2
 ```
 #### Arguments
 > -place `[REQUIRED]`
-
 > -pages `[OPTIONAL]`
 
 ### [Hotel_Amenities.py](Hotel_Amenities.py)
@@ -44,7 +42,6 @@ python Hotel_Amenities.py -place Noto -pages 2
 ```
 #### Arguments
 > -place `[REQUIRED]`
-
 > -pages `[OPTIONAL]`
 
 ### [Hotel_Reviews.py](Hotel_Reviews.py)
@@ -53,10 +50,8 @@ python Hotel_Reviews.py -place Noto -pages 2 -pr 2
 ```
 #### Arguments
 > -place `[REQUIRED]`
-
 > -pages `[OPTIONAL]`
-
 > -pr `[OPTIONAL]`
 
 ## Complete documentation
-- [Tecnical Report - IIT(CNR)](https://www.iit.cnr.it/node/58830)
+The complete technical documentation is available at this link: [Tecnical Report - IIT(CNR)](https://www.iit.cnr.it/node/58830)
