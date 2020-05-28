@@ -59,4 +59,4 @@ python Hotel_Reviews.py -place Noto -pages 2 -pr 2
 > -pr `[OPTIONAL]`
 
 ## Complete documentation
-- [Report - Istituto di Informatica e Telematica (CNR)] (https://www.iit.cnr.it/node/58830)
+- [Tecnical Report - IIT(CNR)](https://www.iit.cnr.it/node/58830)
