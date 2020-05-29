@@ -5,6 +5,8 @@ from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.chrome.options import Options
 import time
 import re
+import emoji
+import emojis
 import configparser
 import mysql.connector
 from mysql.connector import Error
@@ -80,8 +82,8 @@ def reviews():
                 time.sleep(seconds)
                 all_reviews = driver.find_elements_by_xpath("//q[contains(@class, 'location-review')]") 
                 for i in range(0,(len(all_reviews))): #loop reviews
-                    insert_table = "INSERT INTO reviews (Name, City, Rating, Review, Hometown, Date_of_stay, Trip_type) VALUES (%s, %s, %s, %s, %s, %s, %s)"
-                    review = all_reviews[i].text
+                    insert_table = "REPLACE INTO reviews (Name, City, Rating, Review, Hometown, Date_of_stay, Trip_type) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+                    review = emojis.decode(all_reviews[i].text)
                     ix = str(i+1) #index
                     time.sleep(seconds)
                     try:
@@ -127,8 +129,8 @@ def reviews():
                 time.sleep(seconds)
                 all_reviews = driver.find_elements_by_xpath("//q[contains(@class, 'location-review')]")
                 for i in range(0,(len(all_reviews))):
-                    insert_table = "INSERT INTO reviews (Name, City, Rating, Review, Hometown, Date_of_stay, Trip_type) VALUES (%s, %s, %s, %s, %s, %s, %s)"
-                    review = all_reviews[i].text
+                    insert_table = "REPLACE INTO reviews (Name, City, Rating, Review, Hometown, Date_of_stay, Trip_type) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+                    review = emojis.decode(all_reviews[i].text)
                     ix = str(i+1) #index
                     time.sleep(seconds)
                     
@@ -197,7 +199,7 @@ try:
             print(error)
             exit(1)
         
-    cursor.execute("CREATE TABLE IF NOT EXISTS reviews (Name VARCHAR(64) NOT NULL, City VARCHAR(64) NOT NULL, Rating int(2), Review VARCHAR(2048), Hometown VARCHAR(64), Date_of_stay VARCHAR(64), Trip_type VARCHAR(64)) ")
+    cursor.execute("CREATE TABLE IF NOT EXISTS reviews (Name VARCHAR(64) NOT NULL, City VARCHAR(64) NOT NULL, Rating int(2), Review VARCHAR(4096), Hometown VARCHAR(64), Date_of_stay VARCHAR(64), Trip_type VARCHAR(64)) ")
     
     #manage pages
     number_pages = driver.find_element_by_xpath("//a[contains(@class, 'pageNum')][position() = last()]").text
