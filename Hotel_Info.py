@@ -75,17 +75,17 @@ calendar = driver.find_element_by_class_name("_1HphCM4i")
 driver.execute_script("arguments[0].style.position = 'initial';", calendar)
 time.sleep(seconds)
 
-#function info
 def info():
-    insert_table = "INSERT INTO info (Name, City, Address, Url, Rating, Review_Count, Popular_Index) VALUES (%s, %s, %s, %s, %s, %s, %s)"
-    hotel_name = driver.find_element_by_xpath("//h1[contains(@class, 'hotel-review')]").text
+    cursor.execute("SET FOREIGN_KEY_CHECKS = 0")
+    insert_table = "REPLACE INTO info (Name, City, Address, Url, Rating, Review_Count, Popular_Index) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+    hotel_name = driver.find_element_by_xpath("//h1[@id='HEADING']").text
     city = str(args.place)
     try:
-        address = driver.find_element_by_xpath("//div[contains(@class, 'ListingEntry')]//span[contains(@class, 'ContactInfo')][2]").text
+        address = driver.find_element_by_xpath("//div[@class='_1sPw_t0w _3sCS_WGO']//span[@class='_3ErVArsu jke2_wbp']").text
     except:
         address = ""
     try:
-        rating_value = driver.find_element_by_xpath("//div[contains(@class, 'ratingContainer')]//span[contains(@class, 'ui_bubble')]")
+        rating_value = driver.find_element_by_xpath("//div[@class='_2F5IkNIg']//span[contains(@class, 'ui_bubble')]")
         rating_class = rating_value.get_attribute("class")
         value_rating = rating_class[-2:]
         float_rating = value_rating[:1] + '.' + value_rating[1:]
@@ -93,11 +93,11 @@ def info():
     except:
         rating = None
     try:
-        review_count = driver.find_element_by_xpath("//div[contains(@class, 'ratingContainer')]//span[contains(@class, 'reviewCount')]").text
+        review_count = driver.find_element_by_xpath("//span[@class='_33O9dg0j']").text
     except:      
         review_count = ""
     try:
-        popular_index = driver.find_element_by_xpath("//div[contains(@class, 'popIndex')]").text
+        popular_index = driver.find_element_by_xpath("//div[@class='_1vpp5J_x']//span").text
     except:
         popular_index = ""
 
