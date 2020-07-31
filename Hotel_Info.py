@@ -67,7 +67,7 @@ input_search = driver.find_element_by_xpath("//div[@data-test-attribute='typeahe
 input_search.send_keys(args.place)
 time.sleep(seconds)
 driver.find_element_by_xpath("//a[@title='" + args.place + "']").click()
-research = driver.find_element_by_xpath("//button[@id='SUBMIT_HOTELS']").click()
+#research = driver.find_element_by_xpath("//button[@id='SUBMIT_HOTELS']").click()
 time.sleep(seconds)
 
 #close calendar
