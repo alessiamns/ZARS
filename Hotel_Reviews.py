@@ -79,9 +79,9 @@ time.sleep(seconds)
 
 #function reviews: property name, rating, review, hometown, date, triptype for each property
 def reviews():
-    hotel_name = driver.find_element_by_xpath("//h1[contains(@class, 'hotel-review')]").text 
+    hotel_name = driver.find_element_by_xpath("//h1[@id='HEADING']").text 
     try:
-        go_review = driver.find_element_by_xpath("//span[contains(@class, 'reviewCount')]")
+        go_review = driver.find_element_by_xpath("//span[contains(@class, '_33O9dg0j')]")
         go_review.click() #su per scendere giu alle recensioni
         city = str(args.place)
         driver.find_element_by_xpath("//span[contains(text(),'Tutte le lingue')]").click()
@@ -95,17 +95,17 @@ def reviews():
         for j in range(0,pages_review): 
             if j < (pages_review-1): 
                 go_on = driver.find_element_by_xpath("//a[contains(text(),'Avanti')]") #button
-                info_plus = driver.find_element_by_xpath("//div[contains(@class,'Expandable')]//span[contains(text(),'Scopri di pi')]")
+                info_plus = driver.find_element_by_xpath("//div[contains(@class,'XUVJZtom')]//span[contains(text(),'Scopri di pi')]")
                 info_plus.click() 
                 time.sleep(seconds)
-                all_reviews = driver.find_elements_by_xpath("//q[contains(@class, 'location-review')]") 
+                all_reviews = driver.find_elements_by_xpath("//q[contains(@class, 'IRsGHoPm')]") 
                 for i in range(0,(len(all_reviews))): #loop reviews
                     insert_table = "REPLACE INTO reviews (Name, City, Rating, Review, Hometown, Date_of_stay, Trip_type) VALUES (%s, %s, %s, %s, %s, %s, %s)"
                     review = emojis.decode(all_reviews[i].text)
                     ix = str(i+1) #index
                     time.sleep(seconds)
                     try:
-                        rating_value = driver.find_element_by_xpath("//div[contains(@class,'hotels-community')][" + ix + "]//div[contains(@class, 'RatingLine')]//span[contains(@class, 'ui_bubble')]")
+                        rating_value = driver.find_element_by_xpath("//div[contains(@class,'_2wrUUKlw _3hFEdNs8')][" + ix + "]//span[contains(@class, 'ui_bubble')]")
                         rating_class = rating_value.get_attribute("class")
                         length_class = len(rating_class)
                         value_rating_len = rating_class[length_class-2]
@@ -114,20 +114,20 @@ def reviews():
                         rating = ''
                     
                     try:
-                        hometown_element = driver.find_element_by_xpath("//div[contains(@class,'hotels-community')][" + ix + "]//span[contains(@class,'hometown-')]") #hometown
+                        hometown_element = driver.find_element_by_xpath("//div[contains(@class,'_2wrUUKlw _3hFEdNs8')][" + ix + "]//span[contains(@class,'default _3J15flPT small')]") #hometown
                         hometown = hometown_element.text
                     except:
                         hometown = ''
                     
                     try:
-                        date_element = driver.find_element_by_xpath("//div[contains(@class,'hotels-community')][" + ix + "]//span[contains(@class, 'event_date')]") #date
+                        date_element = driver.find_element_by_xpath("//div[contains(@class,'_2wrUUKlw _3hFEdNs8')][" + ix + "]//span[contains(@class, '_34Xs-BQm')]") #date
                         date_bef = date_element.text
                         date = date_bef.replace('Data del soggiorno:', '')
                     except: 
                         date = ''
                     
                     try:
-                        triptype_element = driver.find_element_by_xpath("//div[contains(@class,'hotels-community')]["+ ix + "]//span[contains(@class, 'TripType')]") #type
+                        triptype_element = driver.find_element_by_xpath("//div[contains(@class,'_2wrUUKlw _3hFEdNs8')]["+ ix + "]//span[contains(@class, '_2bVY3aT5')]") #type
                         triptype_bef = triptype_element.text
                         triptype = triptype_bef.replace('Tipo di viaggio:', '')
                     except:
@@ -142,10 +142,10 @@ def reviews():
                 go_on.click()
                 time.sleep(seconds)            
             else: #last page
-                info_plus = driver.find_element_by_xpath("//div[contains(@class, 'location-review')]//span[contains(text(),'Scopri di pi')]")
+                info_plus = driver.find_element_by_xpath("//div[contains(@class,'XUVJZtom')]//span[contains(text(),'Scopri di pi')]")
                 info_plus.click() 
                 time.sleep(seconds)
-                all_reviews = driver.find_elements_by_xpath("//q[contains(@class, 'location-review')]")
+                all_reviews = driver.find_elements_by_xpath("//q[contains(@class, 'IRsGHoPm')]")
                 for i in range(0,(len(all_reviews))):
                     insert_table = "REPLACE INTO reviews (Name, City, Rating, Review, Hometown, Date_of_stay, Trip_type) VALUES (%s, %s, %s, %s, %s, %s, %s)"
                     review = emojis.decode(all_reviews[i].text)
@@ -153,7 +153,7 @@ def reviews():
                     time.sleep(seconds)
                     
                     try:
-                        rating_value = driver.find_element_by_xpath("//div[contains(@class,'hotels-community')][" + ix + "]//div[contains(@class, 'RatingLine')]//span[contains(@class, 'ui_bubble')]")
+                        rating_value = driver.find_element_by_xpath("//div[contains(@class,'_2wrUUKlw _3hFEdNs8')][" + ix + "]//span[contains(@class, 'ui_bubble')]")
                         rating_class = rating_value.get_attribute("class")
                         length_class = len(rating_class)
                         value_rating_len = rating_class[length_class-2]
@@ -162,20 +162,20 @@ def reviews():
                         rating = ''
                     
                     try:
-                        hometown_element = driver.find_element_by_xpath("//div[contains(@class,'hotels-community')][" + ix + "]//span[contains(@class,'hometown-')]") #hometown
+                        hometown_element = driver.find_element_by_xpath("//div[contains(@class,'_2wrUUKlw _3hFEdNs8')][" + ix + "]//span[contains(@class,'default _3J15flPT small')]") #hometown
                         hometown = hometown_element.text
                     except:
                         hometown = ''
                     
                     try:
-                        date_element = driver.find_element_by_xpath("//div[contains(@class,'hotels-community')][" + ix + "]//span[contains(@class, 'event_date')]") #date
+                        date_element = driver.find_element_by_xpath("//div[contains(@class,'_2wrUUKlw _3hFEdNs8')][" + ix + "]//span[contains(@class, '_34Xs-BQm')]") #date
                         date_bef = date_element.text
                         date = date_bef.replace('Data del soggiorno:', '')
                     except: 
                         date = ''
                     
                     try:
-                        triptype_element = driver.find_element_by_xpath("//div[contains(@class,'hotels-community')]["+ ix + "]//span[contains(@class, 'TripType')]") #type
+                        triptype_element = driver.find_element_by_xpath("//div[contains(@class,'_2wrUUKlw _3hFEdNs8')]["+ ix + "]//span[contains(@class, '_2bVY3aT5')]") #type
                         triptype_bef = triptype_element.text
                         triptype = triptype_bef.replace('Tipo di viaggio:', '')
                     except:
